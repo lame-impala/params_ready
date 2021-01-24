@@ -1,0 +1,8 @@
+.vs
+.idea
+.project
+.byebug_history
+.ruby-version
+coverage/*
+
+*.gem
