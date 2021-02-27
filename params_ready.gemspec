@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'params_ready'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.licenses    = ['MIT']
   s.date        = '2020-10-07'
   s.homepage    = 'https://github.com/lame-impala/params_ready'
