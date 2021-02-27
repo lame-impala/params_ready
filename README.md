@@ -129,10 +129,10 @@ the parameter neither has default defined nor it has been marked as optional.
 - There is a failsafe alternative method `#unwrap_or(default)` 
 
 Other important methods common to all types of parameters include:
-- `:is_undefined?` – this returns true unless parameter has been 
+- `#is_undefined?` – this returns true unless parameter has been 
 explicitly set (even to a `nil` value) or has a default (again, the default can be `nil`).
-- `:is_nil?` returns true if parameter is defined and its value is `nil`.
-- `:is_definite?` returns true unless parameter is undefined or its value is `nil`.
+- `#is_nil?` returns true if parameter is defined and its value is `nil`.
+- `#is_definite?` returns true unless parameter is undefined or its value is `nil`.
 
 ### Updating parameters
 There are two ways to update parameter depending on whether it is frozen
@@ -1088,7 +1088,7 @@ uses `:backend` formatting.
 When there’s an array among your parameters, you can call `:cnt` on it 
 to get the form label and id for count. The object you receive is not a real a parameter 
 defined on the array; it is a wrapper for the `length` property created ad hoc 
-just for this purpose. You’ll typically inject the count into the view as a hidden field:
+just for this purpose. You’ll typically inject the count into the form as a hidden field:
 
 ```erb
 <%= hidden_field_tag("#{@prms[:users][:filters][:array][:cnt].scoped_name}", @prms[:users][:filters][:array][:cnt].unwrap) %>
@@ -1253,7 +1253,7 @@ params = {
   },
   ordering: [[:name, :asc], [:email, :asc], [:ranking, :desc]]
 }
-relation.from_input(params, context: Format.instance(:backend))
+_, relation = definition.from_input(params, context: Format.instance(:backend))
 date = Date.parse('2020-05-23')
 context = QueryContext.new(Restriction.blanket_permission, { date: date })
 query = relation.build_select(context: context)
@@ -1442,7 +1442,7 @@ end.build
 The library also defines 'exists predicate' that filters records from certain
 table on existence or non-existence of related records in other table. Relation
 between the two tables is established in the `#related` block, with 
-syntax equal as the one used for joins. If the relation is based on
+syntax equal to the one used for joins. If the relation is based on
 something more complex than equality of two columns, SQL literal, Arel node or 
 a proc can be passed to the `#on` method.
 
@@ -1562,7 +1562,7 @@ number of named predicates while array grouping can hold any number of predicate
 of homogeneous type. This is actually more useful than it sounds since predicates 
 allow for some variance themselves and there is also the polymorph parameter to 
 accommodate any number of different types of predicates. Note that `Relation` and 
-`ExistPredicate` are implemented in terms of grouping, so what is to be said 
+`ExistsPredicate` are implemented in terms of grouping, so what is to be said 
 here applies to those too. 
 
 #### Structured grouping
@@ -1741,8 +1741,9 @@ we are going to incorporate the hash into links to other locations, this
 is probably what we want to be able to pick the values up from URI variables later. 
 
 Call `relation[:ordering].by_columns` to get a hash where keys are column names 
-and values indicate current ordering for each column. It may be useful if you are 
-marking column headers in your view with arrows or other visual hints to indicate ordering.
+and values indicate current ordering for each column and its position in the ordering clause. 
+It may be useful if you are marking column headers in your view with arrows or other visual 
+hints to indicate ordering.
 
 ### Pagination
 This library implements two standard pagination methods: offset based and keyset based.
