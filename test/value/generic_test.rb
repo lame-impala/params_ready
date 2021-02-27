@@ -3,6 +3,43 @@ require_relative '../../lib/params_ready/parameter/value_parameter'
 
 module ParamsReady
   module Value
+    class CustomTest < Minitest::Test
+      class CustomCoder
+        include Coercion
+
+        def coerce(v, _)
+          DummyObject.new(v)
+        end
+
+        def format(v, _)
+          v.format
+        end
+
+        def strict_default?
+          false
+        end
+      end
+
+      def test_custom_coder_can_be_defined
+        coder = CustomCoder.new
+        d = Builder.define_value :custom, coder
+        input = { custom: 'FOO' }
+        _, p = d.from_hash(input)
+        assert_equal "Wrapped value: 'FOO'", p.unwrap.say
+        hash = p.to_hash(:frontend)
+        exp = { custom: 'FOO' }
+        assert_equal exp, hash
+      end
+
+      def test_strict_default_policy_can_be_relaxed
+        coder = CustomCoder.new
+        d = Builder.define_value :custom, coder do
+          default 'BAR'
+        end
+        assert_equal 'BAR', d.default.format
+      end
+    end
+
     class GenericTest < Minitest::Test
       def test_generic_coder_can_be_defined
         d = Builder.define_value :object do

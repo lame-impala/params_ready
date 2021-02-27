@@ -6,26 +6,29 @@ require_relative '../extensions/class_reader_writer'
 
 module ParamsReady
   module Value
+    module Coercion
+      def try_coerce(input, context)
+        coerce input, context
+      rescue => _error
+        raise CoercionError.new(input, value_class_name)
+      end
+
+      def strict_default?
+        true
+      end
+    end
+
     class Coder
       extend Extensions::ClassReaderWriter
-
-      class_reader_writer :type_identifier
-      type_identifier :value
+      extend Coercion
 
       def self.value_class_name
         last = self.name.split("::").last
         last.remove('Coder')
       end
 
-      def self.try_coerce(input, context)
-        coerce input, context
-      rescue => _error
-        raise CoercionError.new(input, value_class_name)
-      end
-
-      def self.strict_default?
-        true
-      end
+      class_reader_writer :type_identifier
+      type_identifier :value
     end
 
     class GenericCoder

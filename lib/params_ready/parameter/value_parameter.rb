@@ -113,7 +113,7 @@ module ParamsReady
       name_for_formatter :value
 
       def name_for_formatter
-        coder_name = @coder.type_identifier
+        coder_name = @coder.type_identifier if @coder.respond_to? :type_identifier
         return coder_name unless coder_name.nil?
 
         super

@@ -228,6 +228,24 @@ Builder.define_value :custom do
 end
 ```
 
+Or you can pass a ready-made coder instance into the builder factory method:
+
+```ruby
+class CustomCoder
+  include Coercion 
+  
+  def coerce(value, _)
+    # ...    
+  end
+  
+  def format(value, _)
+    # ...
+  end
+end
+
+Builder.define_value :custom, CustomCoder.new
+```
+
 In case the coder is unable to handle the input there are several options for
 what to do:
 - it can throw an arbitrary error that will be wrapped into a `CoercionError` 
