@@ -35,7 +35,7 @@ module ParamsReady
       end
 
       def get_def
-        definition = Builder.define_relation :users do
+        Builder.define_relation :users do
           model User
           operator { local :and }
           join_table Profile.arel_table, :outer do
@@ -185,7 +185,7 @@ module ParamsReady
         r = relation.reorder(:email, :desc)
         exp = 'email-desc|name-asc|ranking-desc'
 
-        assert_equal({ name: :asc, email: :asc, ranking: :desc }, relation[:ordering].by_columns)
+        assert_equal({ name: [:asc, 0], email: [:asc, 1], ranking: [:desc, 2] }, relation[:ordering].by_columns)
         assert_equal(exp, t[:ord])
         assert_equal(exp, r[:ord])
       end

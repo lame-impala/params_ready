@@ -81,9 +81,9 @@ module ParamsReady
         d = get_param_definition
         _, ordering = d.from_hash({ord: "email-desc|hits-asc"})
         hash = ordering.by_columns
-        assert_equal :desc, hash[:email]
-        assert_equal :asc, hash[:hits]
-        assert_equal :none, hash[:anything_else]
+        assert_equal [:desc, 0], hash[:email]
+        assert_equal [:asc, 1], hash[:hits]
+        assert_equal [:none, nil], hash[:anything_else]
       end
 
       def test_reordering_works

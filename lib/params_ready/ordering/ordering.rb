@@ -27,8 +27,8 @@ module ParamsReady
       end
 
       def by_columns
-        bare_value.each_with_object(Hash.new(:none)) do |tuple, hash|
-          hash[tuple[0].unwrap] = tuple[1].unwrap
+        bare_value.each_with_index.each_with_object(Hash.new([:none, nil])) do |(tuple, index), hash|
+          hash[tuple[0].unwrap] = [tuple[1].unwrap, index]
         end
       end
 
