@@ -13,13 +13,24 @@ module ParamsReady
           type = Value::Constraint.constraint_type(name_or_constraint)
           type.build(*args, **opts, &block)
         else
-          if name_or_constraint.respond_to?(:valid?) && name_or_constraint.respond_to?(:error_message)
-            name_or_constraint
-          else
-            raise ParamsReadyError, "Not a constraint: #{name_or_constraint.class.name}"
-          end
+          valid, missing_method = valid_constraint?(name_or_constraint, strategy)
+          on_constraint_invalid(missing_method) unless valid
+          name_or_constraint
         end
         new(constraint, strategy: strategy)
+      end
+
+      def self.on_constraint_invalid(missing_method)
+        raise ParamsReadyError, "Not a valid constraint, '#{missing_method}' unimplemented"
+      end
+
+      def self.valid_constraint?(constraint, strategy)
+        return [false, 'valid?'] unless constraint.respond_to?(:valid?)
+        return [false, 'error_message'] unless constraint.respond_to?(:error_message)
+        return [true, nil] unless strategy == :clamp
+        return [false, 'clamp'] unless constraint.respond_to? :clamp
+
+        [true, nil]
       end
 
       def initialize(constraint, strategy: :raise)
@@ -33,7 +44,9 @@ module ParamsReady
         when :raise, :undefine
           strategy.to_sym
         when :clamp
-          raise ParamsReadyError, 'Clamping not applicable' unless constraint.clamp?
+          if constraint.respond_to? :clamp?
+            raise ParamsReadyError, 'Clamping not applicable' unless constraint.clamp?
+          end
           strategy.to_sym
         else
           raise ParamsReadyError, "Unexpected constraint strategy #{strategy}"

@@ -62,6 +62,12 @@ module ParamsReady
         end
       end
 
+      class ClampingEvenConstraint < EvenConstraint
+        def self.clamp(value)
+          value - 1
+        end
+      end
+
       def test_custom_constraint_works
         d = Builder.define_integer(:even) do
           constrain EvenConstraint
@@ -71,6 +77,24 @@ module ParamsReady
         r, _ = d.from_input 5
         refute r.ok?
         assert_equal "errors for even -- value '5' is not even", r.error.message
+      end
+
+      def test_non_clamping_constraint_raises_with_clamp_strategy
+        err = assert_raises do
+          Builder.define_integer(:even) do
+            constrain EvenConstraint, strategy: :clamp
+          end
+        end
+        assert_equal "Not a valid constraint, 'clamp' unimplemented", err.message
+      end
+
+      def test_clamping_constraint_works
+        d = Builder.define_integer(:even) do
+          constrain ClampingEvenConstraint, strategy: :clamp
+        end
+        r, p = d.from_input 5
+        assert r.ok?
+        assert_equal 4, p.unwrap
       end
 
       def test_undefine_constraint_works_with_optional
