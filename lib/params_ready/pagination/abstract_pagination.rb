@@ -10,8 +10,8 @@ module ParamsReady
         update_in(first_page_value, [])
       end
 
-      def last_page(*args)
-        update_in(last_page_value(*args), [])
+      def last_page(*args, **opts)
+        update_in(last_page_value(*args, **opts), [])
       end
     end
   end
