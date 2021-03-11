@@ -18,9 +18,8 @@ module ParamsReady
       end
     end
 
-    class Coder
+    class AbstractCoder
       extend Extensions::ClassReaderWriter
-      extend Coercion
 
       def self.value_class_name
         last = self.name.split("::").last
@@ -31,10 +30,38 @@ module ParamsReady
       type_identifier :value
     end
 
+    class Coder < AbstractCoder
+      extend Coercion
+
+      def self.instance(**opts)
+        raise ParamsReadyError, "No options expected, got: #{opts}" unless opts.empty?
+
+        self
+      end
+
+      class Instantiable < AbstractCoder
+        include Coercion
+
+        def self.instance(**opts)
+          new **opts
+        end
+
+        def type_identifier
+          self.class.type_identifier
+        end
+
+        def strict_default?
+          self.class.strict_default?
+        end
+      end
+    end
+
+
     class GenericCoder
       extend Extensions::LateInit
       extend Extensions::Finalizer
       include Extensions::Finalizer::InstanceMethods
+      include Coercion
 
       def initialize(name)
         @name = name
@@ -42,8 +69,6 @@ module ParamsReady
         @format = nil
         @type_identifier = nil
       end
-
-      def strict_default?; true; end
 
       late_init(:coerce, getter: false)
       late_init(:format, getter: false)
@@ -53,10 +78,8 @@ module ParamsReady
         @name
       end
 
-      def try_coerce(input, context)
+      def coerce(input, context)
         @coerce[input, context]
-      rescue => _error
-        raise CoercionError.new(input, @name)
       end
 
       def format(value, format)

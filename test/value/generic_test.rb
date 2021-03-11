@@ -40,7 +40,84 @@ module ParamsReady
       end
     end
 
+    class InstantiableCoderTest < Minitest::Test
+      class CoderFactory < Coder::Instantiable
+        def initialize(value_class:)
+          @value_class = value_class
+        end
+
+        def coerce(v, _)
+          @value_class.new(v)
+        end
+
+        def format(v, _)
+          v.format
+        end
+
+        def self.strict_default?
+          false
+        end
+
+        type_identifier :dummy
+
+        Parameter::ValueParameterBuilder.register_coder :instantiable, CoderFactory
+      end
+
+      def test_works_as_a_child_in_hash_parameter
+        d = Builder.define_hash :hash do
+          add :instantiable, :instantiable, value_class: DummyObject
+        end
+        _, p = d.from_input({ instantiable: 'FOO' })
+        assert_equal "Wrapped value: 'FOO'", p[:instantiable].unwrap.say
+        hash = p.for_output(:frontend)
+        exp = { instantiable: 'FOO' }
+        assert_equal exp, hash
+      end
+
+      def test_works_as_a_prototype_in_array_parameter
+        d = Builder.define_array :array do
+          prototype :instantiable, value_class: DummyObject
+        end
+        _, p = d.from_hash({ array: ['FOO'] }, context: :frontend)
+        assert_equal "Wrapped value: 'FOO'", p[0].unwrap.say
+        hash = p.to_hash(:frontend)
+        exp = { array: { '0' => 'FOO', 'cnt' => '1' }}
+        assert_equal exp, hash
+      end
+
+      def test_type_identifier_can_be_defined
+        d = Builder.define_instantiable :instantiable, value_class: DummyObject
+        coder = d.instance_variable_get(:@coder)
+        assert_equal :dummy, coder.type_identifier
+      end
+
+      def test_instantiable_coder_can_be_defined
+        d = Builder.define_instantiable :instantiable, value_class: DummyObject
+
+        input = { instantiable: 'FOO' }
+        _, p = d.from_hash(input)
+        assert_equal "Wrapped value: 'FOO'", p.unwrap.say
+        hash = p.to_hash(:frontend)
+        exp = { instantiable: 'FOO' }
+        assert_equal exp, hash
+      end
+
+      def test_strict_default_policy_can_be_relaxed
+        d = Builder.define_instantiable :instantiable, value_class: DummyObject do
+          default 'FOO'
+        end
+        assert_equal 'FOO', d.default.format
+      end
+    end
+
     class GenericTest < Minitest::Test
+      def test_generic_coder_does_not_accept_options
+        err = assert_raises(ParamsReadyError) do
+          d = Builder.define_value :object, option: :option
+        end
+        assert_equal 'Expected option hash to be empty', err.message
+      end
+
       def test_generic_coder_can_be_defined
         d = Builder.define_value :object do
           coerce do |v, _|

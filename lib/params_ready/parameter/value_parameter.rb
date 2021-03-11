@@ -70,28 +70,32 @@ module ParamsReady
         builder_class.register name
       end
 
-      def self.instance(name, coder_or_name = nil, altn: nil)
+      def self.instance(name, coder_or_name = nil, altn: nil, **opts)
         coder = if coder_or_name.is_a? Symbol
-          self.coder(coder_or_name)
-        elsif coder_or_name.nil?
-          Value::GenericCoder.new(name)
+          coder_class = self.coder(coder_or_name)
+          coder_class.instance(**opts)
         else
-          coder_or_name
+          raise ParamsReadyError, 'Expected option hash to be empty' unless opts.empty?
+          if coder_or_name.nil?
+            Value::GenericCoder.new(name)
+          else
+            coder_or_name
+          end
         end
         new ValueParameterDefinition.new(name, coder, altn: altn)
       end
 
-      def self.[](type)
+      def self.[](coder_name)
         builder = Class.new(self)
-        capitalized = type.to_s.split('_').map(&:capitalize).join
+        capitalized = coder_name.to_s.split('_').map(&:capitalize).join
         qualified = "#{self.name}::#{capitalized}Builder".freeze
 
         builder.define_singleton_method :name do
           qualified
         end
 
-        builder.define_singleton_method :instance do |name, altn: nil|
-          superclass.instance(name, type, altn: altn)
+        builder.define_singleton_method :instance do |name, altn: nil, **opts|
+          superclass.instance(name, coder_name, altn: altn, **opts)
         end
 
         builder

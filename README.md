@@ -1,8 +1,8 @@
 # ParamsReady
 ## Define controller interfaces in Rails
-Create well defined controller interfaces. Preprocess, coerce and constrain 
+Create well defined controller interfaces. Sanitize, coerce and constrain 
 incoming parameters to safely populate data models, hold session state in URI variables 
-across different locations, build SQL queries. 
+across different locations, build SQL queries, apply ordering and offset/keyset pagination. 
 
 ## Basics
 This library is concerned with the receiving part of the controller
@@ -211,6 +211,38 @@ module ParamsReady
 
     Parameter::ValueParameterBuilder.register_coder :downcase_string, DowncaseStringCoder
   end
+end
+```
+
+All built-in coders are implemented as static classes. Their coercion methods 
+behave as pure functions and work only with the data passed in as arguments. Sometimes you 
+may need to create a more flexible coder depending on some internal state. To achieve that, 
+subclass `Coder::Instantiable` instead of `Coder`. Then you can pass initializer arguments 
+for the coder instance into the builder:
+
+```ruby
+module ParamsReady
+  module Value
+    class EnumCoder < Coder::Instantiable
+      def initialize(enum_class:)
+        @enum_class = enum_class
+      end
+      
+      def coerce(value, _context)
+        @enum_class.instance(value)
+      end
+    
+      def format(value, _format)
+        value.to_s
+      end
+    end
+
+    Parameter::ValueParameterBuilder.register_coder :enum, EnumCoder
+  end
+end
+
+Builder.define_hash :hash do
+  add :enum, :role_enum, enum_class: RoleEnum
 end
 ```
 
