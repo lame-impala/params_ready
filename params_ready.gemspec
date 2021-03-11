@@ -1,14 +1,16 @@
+require_relative 'lib/params_ready'
+
 Gem::Specification.new do |s|
   s.name        = 'params_ready'
-  s.version     = '0.0.2'
+  s.version     = ParamsReady::VERSION
   s.licenses    = ['MIT']
   s.date        = '2020-10-07'
   s.homepage    = 'https://github.com/lame-impala/params_ready'
   s.summary     = 'Define controller interfaces in Rails'
   s.description = <<~DESC
-    Create well defined controller interfaces. Preprocess, coerce and constrain 
+    Create well defined controller interfaces. Sanitize, coerce and constrain 
     incoming parameters to safely populate data models, hold session state in URI variables 
-    across different locations, build SQL queries.
+    across different locations, build SQL queries, apply ordering and offset/keyset pagination.
   DESC
   s.authors     = ['Tomas Milsimer']
   s.email       = 'tomas.milsimer@protonmail.com'
@@ -106,10 +108,10 @@ Gem::Specification.new do |s|
     lib/params_ready.rb
   ]
   s.add_dependency 'ruby2_keywords', '~> 0'
-  s.add_development_dependency 'activerecord', '~> 6'
+  s.add_dependency 'activerecord', '~> 6'
   s.add_development_dependency 'byebug', '~> 11'
   s.add_development_dependency 'memory_profiler', '~> 0.9'
-  # s.add_development_dependency 'minitest-rg'
-  # s.add_development_dependency 'simplecov', '~> 0.20'
-  # s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'minitest-rg', '~> 5'
+  s.add_development_dependency 'simplecov', '~> 0.20'
+  s.add_development_dependency 'sqlite3', '~> 1'
 end
