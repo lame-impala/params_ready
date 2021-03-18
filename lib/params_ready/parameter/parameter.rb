@@ -8,8 +8,12 @@ module ParamsReady
   module Parameter
     module FromHash
       def set_from_hash(hash, context: nil, validator: Result.new(name))
-        _, input = find_in_hash hash, context
-        set_from_input(input, context, validator)
+        if local?(context)
+          populate(context, validator)
+        else
+          _, input = find_in_hash hash, context
+          set_from_input(input, context, validator)
+        end
       end
     end
 
@@ -276,14 +280,6 @@ module ParamsReady
 
       def hash_key(format)
         format.hash_key(self)
-      end
-
-      def set_from_hash(hash, context: nil, validator: Result.new(name))
-        if local?(context)
-          populate(context, validator)
-        else
-          super
-        end
       end
 
       def set_from_input(input, context, validator)

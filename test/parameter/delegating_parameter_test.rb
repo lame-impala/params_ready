@@ -4,6 +4,33 @@ require_relative '../../lib/params_ready/query/structured_grouping'
 module ParamsReady
   module Parameter
     class DelegatingParameterTest < Minitest::Test
+      def get_delegating_param_definition
+        Query::FixedOperatorPredicateBuilder.instance(:test).include do
+          operator :equal
+          type(:value, :integer) { optional }
+        end.build
+      end
+
+      def get_delegating_param
+        get_delegating_param_definition.create
+      end
+
+      def test_local_delegate_is_populated
+        d = Query::FixedOperatorPredicateBuilder.instance(:test).include do
+          operator :equal
+          type(:value, :integer) { optional }
+          local
+          optional
+          populate do |context, param|
+            param.set_value(context[:loc])
+          end
+        end.build
+
+        context = InputContext.new(:frontend, { loc: 178 })
+        _, p = d.from_hash({}, context: context)
+        assert_equal 178, p.unwrap
+      end
+
       def test_inferred_default_works
         p = Query::StructuredGroupingBuilder.instance(:inferred).include do
           exists_predicate :inferred do
@@ -17,17 +44,6 @@ module ParamsReady
           default :inferred
         end.build.create
         assert p.default_defined?
-      end
-
-      def get_delegating_param_definition
-        Query::FixedOperatorPredicateBuilder.instance(:test).include do
-          operator :equal
-          type(:value, :integer) { optional }
-        end.build
-      end
-
-      def get_delegating_param
-        get_delegating_param_definition.create
       end
 
       def test_set_value_works_with_delegee
