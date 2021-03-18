@@ -101,7 +101,8 @@ module ParamsReady
       backend: Format.new(marshal: :none, omit: [], naming_scheme: :standard, remap: false, local: true, name: :backend),
       frontend: Format.new(marshal: :all, omit: OMIT_ALL, naming_scheme: :alternative, remap: false, local: false, name: :frontend),
       attributes: Format.new(marshal: :none, omit: %i(undefined), naming_scheme: :standard, remap: false, local: true, name: :attributes),
-      json: Format.new(marshal: { except: [:array, :tuple, :boolean, :number] }, omit: [], naming_scheme: :alternative, remap: true, local: false, name: :json)
+      json: Format.new(marshal: { except: [:array, :tuple, :boolean, :number] }, omit: [], naming_scheme: :alternative, remap: true, local: false, name: :json),
+      inspect: Format.new(marshal: :none, omit: [], naming_scheme: :standard, remap: false, local: false, name: :inspect)
     }.freeze
 
     def self.define(name, format)

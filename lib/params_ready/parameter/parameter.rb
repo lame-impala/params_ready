@@ -188,7 +188,9 @@ module ParamsReady
       end
 
       def inspect
-        "#{self.class.name.split("::").last} #{self.name}: { #{inspect_content} }"
+        preserve = Format.instance(:inspect).preserve?(self)
+        content = preserve ? inspect_content : '[FILTERED]'
+        "#{self.class.name.split("::").last} #{self.name}: { #{content} }"
       end
 
       def dup

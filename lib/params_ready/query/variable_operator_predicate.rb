@@ -33,8 +33,8 @@ module ParamsReady
 
       def inspect_content
         op, val = if is_definite?
-          op = @data[:operator].unwrap_or(nil)&.name || '?'
-          val = @data[:value].unwrap_or('?')
+          @data[:operator].unwrap_or(nil)&.name || '?'
+          @data[:value].unwrap_or('?')
         else
           %w[? ?]
         end
