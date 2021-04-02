@@ -44,11 +44,11 @@ conversion bugs. A few built-in parameters relax on this policy, namely
 `Operator` and `GroupingOperator`, so it is possible to write `default :and`, 
 passing in a symbol instead of an actual operator instance.
 - `#optional` marks a parameter that can take on `nil` value.
-- `#no_input` creates a parameter that doesn’t read from non-local input 
-(coming from the outside). An optional argument can be passed into the  
+- `#no_input` creates a parameter that doesn’t read from non-local input
+(coming from the outside). An optional argument can be passed into the
 method call to be used as the default value. Another way to assign a value
-to the parameter is the `#populate` callback. A no-output parameter may be 
-used where a piece of information known at the current location needs to 
+to the parameter is the `#populate` callback. A no-output parameter may be
+used where a piece of information known at the current location needs to
 be passed over elsewhere in an URI variable.
 - `#no_output` prevents parameter from writing its value to non-local output (meaning
 output sent to other location).
@@ -1851,7 +1851,7 @@ You can use them in your controllers or views like so:
 
 ```ruby
 @previous = if @parts.length.positive?
-  first = @records.first
+  first = @parts.first
   keyset = { part_id: first.part_id, company_id: first.company_id }
   @prms.relation(:parts).before(keyset)
 end
