@@ -30,7 +30,7 @@ module ParamsReady
             no_output
           end
           add :symbol, :symbol do
-            local :sym
+            no_output rule: { except: [:inspect] }
           end
           add :date, :date do
             no_output
@@ -86,7 +86,7 @@ module ParamsReady
           HashParameter inspect: { 
            {:integer=>ValueParameter integer: { [FILTERED] }, 
             :string=>ValueParameter string: { [FILTERED] }, 
-            :symbol=>ValueParameter symbol: { [FILTERED] }, 
+            :symbol=>ValueParameter symbol: { :sym }, 
             :date=>ValueParameter date: { [FILTERED] }, 
             :tuple=>TupleParameter tuple: { [FILTERED] }, 
             :array=>ArrayParameter array: { [FILTERED] }} }
