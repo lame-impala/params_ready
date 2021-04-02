@@ -30,7 +30,8 @@ module ParamsReady
           include &local_zero
         end
         assert_equal 0, definition.default
-        assert_equal true, definition.instance_variable_get(:@local)
+        assert_equal true, definition.instance_variable_get(:@no_input)
+        assert_equal true, definition.instance_variable_get(:@no_output)
       end
     end
   end

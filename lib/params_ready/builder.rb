@@ -94,6 +94,10 @@ module ParamsReady
         @definition.set_no_output Helpers::Rule(rule) || true
       end
 
+      def no_input(*arr, rule: nil)
+        @definition.set_no_input *arr, rule: rule
+      end
+
       def local(*arr, rule: nil)
         @definition.set_local *arr, rule: rule
       end

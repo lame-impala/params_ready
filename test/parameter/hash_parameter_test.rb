@@ -85,6 +85,7 @@ module ParamsReady
 
     class HashParameterTest < Minitest::Test
       include HashParameterTestHelper
+
       def test_dup_unfreezes_a_frozen_hash
         d = get_param_definition
         _, p = d.from_hash({ parameter: { checked: true, detail: 5, search: 'stuff' }}, context: :backend)
@@ -413,71 +414,6 @@ module ParamsReady
         assert_equal false, p[:checked].unwrap
         assert_equal 2, p[:detail].unwrap
         assert_equal "joe", p[:search].unwrap
-      end
-
-      def get_local_param
-        Builder.define_hash(:parameter, altn: :param) do
-          add(:boolean, :checked, altn: :chck) do
-            default false
-          end
-          add(:integer, :detail, altn: :dt) do
-            default 0
-            no_output
-          end
-          add(:string, :local, altn: :lc) do
-            local 'local'
-          end
-        end
-      end
-
-      def test_local_parameter_does_not_read_from_hash_using_frontend_format
-        d = get_local_param
-        hash = { param: { chck: true, dt: 5, lc: 'input' }}
-        _, param = d.from_hash hash
-        assert_equal true, param[:checked].unwrap
-        assert_equal 5, param[:detail].unwrap
-        assert_equal 'local', param[:local].unwrap
-      end
-
-      def test_local_parameter_does_reads_from_hash_using_backend_format
-        d = get_local_param
-        hash = { parameter: { checked: true, detail: 5, local: 'input' }}
-        _, param = d.from_hash hash, context: :backend
-        assert_equal true, param[:checked].unwrap
-        assert_equal 5, param[:detail].unwrap
-        assert_equal 'input', param[:local].unwrap
-      end
-
-      def test_local_parameter_can_be_set_using_set_value
-        p = get_local_param.create
-        p.set_value(checked: true, detail: 5, local: 'input')
-
-        assert_equal true, p[:checked].unwrap
-        assert_equal 5, p[:detail].unwrap
-        assert_equal 'input', p[:local].unwrap
-      end
-
-      def test_local_parameter_does_output_with_attributes_format
-        p = get_local_param.create
-        p.set_value(checked: true, detail: 5)
-        output = p.for_model
-        exp = {
-          checked: true,
-          detail: 5,
-          local: 'local'
-        }
-        assert_equal exp, output
-      end
-
-      def test_local_parameter_does_not_output_with_frontend_format
-        p = get_local_param.create
-        p.set_value(checked: true, detail: 5)
-        p[:local] = 'changed'
-        output = p.for_frontend
-        exp = {
-          chck: 'true'
-        }
-        assert_equal exp, output
       end
     end
 

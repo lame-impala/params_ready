@@ -8,7 +8,7 @@ module ParamsReady
   module Parameter
     module FromHash
       def set_from_hash(hash, context: nil, validator: Result.new(name))
-        if local?(context)
+        if no_input?(context)
           populate(context, validator)
         else
           _, input = find_in_hash hash, context
@@ -211,7 +211,7 @@ module ParamsReady
 
     class Parameter < AbstractParameter
       def_delegators :@definition,
-                     :default, :optional?, :default_defined?, :constraints, :no_output?, :local?
+                     :default, :optional?, :default_defined?, :constraints, :no_output?, :no_input?
 
       def initialize(definition)
         @value = Extensions::Undefined

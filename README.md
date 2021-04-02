@@ -6,7 +6,7 @@ across different locations, build SQL queries, apply ordering and offset/keyset 
 
 ## Basics
 This library is concerned with the receiving part of the controller
-interface, ie. the set of parameters the controller would accept
+interface, i.e. the set of parameters the controller would accept
 for particular actions. Technically the interface is a tree
 of `Parameter` objects of different types. Let’s first introduce 
 these and show how they are defined and constructed. 
@@ -44,13 +44,18 @@ conversion bugs. A few built-in parameters relax on this policy, namely
 `Operator` and `GroupingOperator`, so it is possible to write `default :and`, 
 passing in a symbol instead of an actual operator instance.
 - `#optional` marks a parameter that can take on `nil` value.
+- `#no_input` creates a parameter that doesn’t read from non-local input 
+(coming from the outside). An optional argument can be passed into the  
+method call to be used as the default value. Another way to assign a value
+to the parameter is the `#populate` callback. A no-output parameter may be 
+used where a piece of information known at the current location needs to 
+be passed over elsewhere in an URI variable.
 - `#no_output` prevents parameter from writing its value to non-local output (meaning
 output sent to other location).
-- `#local` creates a parameter that doesn’t read from non-local input (coming from the
-outside) neither writes into non-local output. You can think of local parameters as 
-instance variables on the parameter object with the advantage that they enjoy full 
-library support for type coercion, duplication, freeze, update and more. An optional 
-argument can be passed into the `#local` method to be used as the default value.
+- `#local` parameter is marked both as `no_input` and `no_output`. You can think of local 
+parameters as instance variables on the parameter object with the advantage that they enjoy full 
+library support for type coercion, duplication, freeze, update and more. As with the `#no_input` 
+method, an optional default value is accepted.
 - `#preprocess` sets a callback that allows to sanitize, alter or refuse value 
 before parameter is instantiated from non-local input. 
 The raw value is passed in along with context object and the parameter’s definition. 
@@ -59,7 +64,7 @@ from the definition and return that. If the input is considered unacceptable,
 an error can be raised.
 - `#postprocess` callback is called just after parameter has been set from input. 
 The block receives the parameter itself and a context object. 
-- `#populate` is available only for parameters marked as `local`, so that they 
+- `#populate` is available only for parameters marked as `no_input`, so that they 
 can be set in one sweep along with other parameters when reading from non-local input. A context 
 object and the parameter object to operate on are passed in.
 For some examples of these callbacks in use, check out the [Populate data models](#models) 
@@ -78,7 +83,8 @@ definition = Builder.define_integer :ranking do
   include &local_zero
 end
 assert_equal 0, definition.default
-assert_equal true, definition.instance_variable_get(:@local)
+assert_equal true, definition.instance_variable_get(:@no_input)
+assert_equal true, definition.instance_variable_get(:@no_output)
 ```
 
 The product of a builder is a parameter definition. It is frozen at the end of the 

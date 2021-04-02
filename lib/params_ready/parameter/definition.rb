@@ -96,7 +96,7 @@ module ParamsReady
         preprocessor: nil,
         populator: nil,
         postprocessor: nil,
-        local: false,
+        no_input: nil,
         no_output: nil,
         **opts
       )
@@ -106,7 +106,7 @@ module ParamsReady
         @preprocessor = preprocessor
         @postprocessor = postprocessor
         @populator = populator
-        @local = local
+        @no_input = no_input
         @no_output = no_output
 
         set_default(default) unless default == Extensions::Undefined
@@ -126,6 +126,7 @@ module ParamsReady
       end
 
       late_init :populator, getter: true, once: true, obligatory: false
+      late_init :no_input, getter: false, once: false
       late_init :no_output, getter: false, once: false
       late_init :memoize, getter: true, obligatory: false
 
@@ -173,38 +174,37 @@ module ParamsReady
         validator
       end
 
-      def set_local(*arr, rule: nil)
-        if rule.nil?
-          @local = true
-        else
-          @local = Helpers::Rule(rule)
-        end
+      def set_no_input(*arr, rule: nil)
+        @no_input = Helpers::Rule(rule) || true
+        raise ParamsReadyError, "Default not expected: #{arr}" if rule == false
+
         set_default *arr unless arr.empty?
       end
 
-      def local?(format)
-        case @local
+      def set_local(*arr, rule: nil)
+        rule = Helpers::Rule(rule)
+        set_no_input(*arr, rule: rule)
+        set_no_output(rule || true)
+      end
+
+      def no_input?(format)
+        restricted_for_format?(@no_input, format)
+      end
+
+      def no_output?(format)
+        restricted_for_format?(@no_output, format)
+      end
+
+      def restricted_for_format?(rule, format)
+        case rule
         when nil, false
           false
         when true
           !format.local?
         when Helpers::Rule
-          @local.include? format.name
+          rule.include?(format.name)
         else
-          raise ParamsReadyError, "Unexpected rule: #{@local}"
-        end
-      end
-
-      def no_output?(format)
-        case @no_output
-        when nil, false
-          return local?(format)
-        when true
-          return !format.local?
-        when Helpers::Rule
-          @no_output.include? format.name
-        else
-          raise ParamsReadyError, "Unexpected option: '#{@no_output}'"
+          raise ParamsReadyError, "Unexpected rule: #{rule}"
         end
       end
 
@@ -235,16 +235,16 @@ module ParamsReady
 
 
       def finish
-        if @populator && !@local
-          raise ParamsReadyError, "Populator set for non-local parameter '#{name}'"
+        if @populator && !@no_input
+          raise ParamsReadyError, "Populator set for input parameter '#{name}'"
         end
 
-        if @preprocessor && @local
-          raise ParamsReadyError, "Preprocessor set for local parameter '#{name}'"
+        if @preprocessor && @no_input == true
+          raise ParamsReadyError, "Preprocessor set for no-input parameter '#{name}'"
         end
 
-        if @postprocessor && @local
-          raise ParamsReadyError, "Postprocessor set for local parameter '#{name}'"
+        if @postprocessor && @no_input == true
+          raise ParamsReadyError, "Postprocessor set for no-input parameter '#{name}'"
         end
 
         super
