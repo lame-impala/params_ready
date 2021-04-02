@@ -5,7 +5,7 @@ module ParamsReady
   module Parameter
     class InspectTest < Minitest::Test
       def get_def
-        d = Builder.define_hash :inspect do
+        Builder.define_hash :inspect do
           add :integer, :integer
           add :string, :string
           add :symbol, :symbol
@@ -22,7 +22,7 @@ module ParamsReady
       end
 
       def get_secretive_def
-        d = Builder.define_hash :inspect do
+        Builder.define_hash :inspect do
           add :integer, :integer do
             local 10
           end

@@ -838,7 +838,7 @@ this way, such as `:frontend`, `:json`, `:backend` and `:attributes`.
 ### Restriction
 Sometimes we need to decide dynamically what particular parameters to include in or omit from output. 
 The library provides the concept of restriction to do that. The `Restriction` class 
-defines two factories, `#permit` and `#prohibit` that expect an array of 
+defines two factories, `::permit` and `::prohibit` that expect an array of 
 symbols representing parameter names and returns an instance of restriction object that
 can be passed to the `#for_output` method and the likes.   
 Each parameter in the list is either permitted or prohibited as a whole. If you need more
@@ -1326,7 +1326,7 @@ Here we see an invocation of `#build_relation` with some more options it accepts
 
 ```ruby
 restriction = Restriction.permit(:name_like, { ordering: [:name] })
-result = relation.build_relation(scope: User.active, include: [:posts], restriction: restriction)
+result = relation.build_relation(scope: User.active, include: [:posts], context: restriction)
 ```
 
 If scope is passed in, it will be used in preference to the model class set in the 
@@ -1816,7 +1816,7 @@ There are a few rules to observe in order to obtain correct results:
 aliased in the ordering clause. You will have to pass the full expression, 
 not only an alias, for the column into the ordering definition. 
 2) If you want to order on a nullable column, you always have to specify
-null handling policy.
+null handling policy (other than `:default`).
 3) You can't reorder the relation received from the `#build_relation` call and
 you can't apply any additional scopes onto it.
    
