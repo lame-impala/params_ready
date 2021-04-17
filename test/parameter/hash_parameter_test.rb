@@ -524,70 +524,6 @@ module ParamsReady
       end
     end
 
-    class BehaviourWithAttributesIntent < Minitest::Test
-      def test_nil_values_are_not_omitted_if_default_is_nil
-        d = Builder.define_hash(:parameter, altn: :parameter) do
-          add(:string, :detail) do
-            default 'N/A'
-          end
-          add(:string, :name) do
-            default nil
-          end
-        end
-
-        _, p = d.from_hash nil
-        assert_equal({ detail: 'N/A', name: nil }, p.for_model)
-      end
-
-      def test_undefined_values_are_omitted_from_attributes
-        d = get_complex_param_definition
-        _, p = d.from_hash(nil)
-        assert_equal({}, p.for_model)
-
-        exp = { detail: 'Info' }
-        format = Format.instance(:backend)
-        _, p = d.from_hash({ parameter: exp }, context: format)
-        assert_equal exp, p.for_model
-
-        exp[:roles] = [1, 2, 4]
-        _, p = d.from_hash({ parameter: exp }, context: format)
-        assert_equal exp, p.for_model
-
-        exp[:actions] = { view: true }
-        _, p = d.from_hash({ parameter: exp }, context: format)
-        assert_equal exp, p.for_model
-
-        exp[:actions][:edit] = true
-        _, p = d.from_hash({ parameter: exp }, context: format)
-        assert_equal exp, p.for_model
-
-        exp[:score] = [10, 3]
-        _, p = d.from_hash({ parameter: exp }, context: Format.instance(:backend))
-        assert_equal exp, p.for_model
-
-        exp[:evaluation] = { note: 'Ok'}
-        _, p = d.from_hash({ parameter: exp }, context: Format.instance(:backend))
-        assert_equal exp, p.for_model
-      end
-
-      def test_nil_values_are_not_omitted_from_attributes
-        d = get_complex_param_definition
-        _, p = d.from_hash(nil)
-        assert_equal({}, p.for_model)
-
-        exp = {
-          detail: nil,
-          roles: nil,
-          actions: { view: true, edit: nil },
-          score: nil,
-          evaluation: nil
-        }
-        _, p = d.from_hash({ parameter: exp }, context: Format.instance(:backend))
-        p.to_hash_if_eligible(Intent.instance(:frontend))
-        assert_equal exp, p.for_model
-      end
-    end
-
     class HashWithNonOptionalChildrenBehaviour < Minitest::Test
       def get_def
         Builder.define_hash :param do
@@ -639,10 +575,35 @@ module ParamsReady
       end
     end
 
+    class HashOptionalDefaultBeviour < Minitest::Test
+      include HashParameterTestHelper
+
+      def test_writes_nil_if_undefined_and_formatting_is_minify_only
+        p = get_param default: { checked: true, detail: 3, search: 'some' }, optional: true
+        assert_nil p.to_hash_if_eligible(Intent.instance(:minify_only))
+      end
+
+      def test_writes_empty_hash_if_values_eq_defaults_and_formatting_is_minify_only
+        p = get_param default: { checked: true, detail: 3, search: 'some' }, optional: true
+        p[:checked] = false
+        p[:detail] = 0
+        p[:search] = ''
+        assert_equal({ parameter: {}}, p.to_hash_if_eligible(Intent.instance(:minify_only)))
+      end
+
+      def test_sets_to_default_if_input_nil
+        d = get_param_definition default: { checked: true, detail: 3, search: 'some' }, optional: true
+        r, p = d.from_hash({})
+
+        assert r.ok?
+        assert p.is_default?
+      end
+    end
+
     class HashDefaultBehaviour < Minitest::Test
       include HashParameterTestHelper
 
-      def test_writes_empty_hash_if_values_eq_defaults_and_not_overall_default_and_formatting_is_backend
+      def test_writes_empty_hash_if_values_eq_defaults_and_not_overall_default_and_formatting_is_minify_only
         p = get_param default: { checked: true, detail: 3, search: 'some' }
         p[:checked] = false
         p[:detail] = 0

@@ -44,9 +44,11 @@ conversion bugs. A few built-in parameters relax on this policy, namely
 `Operator` and `GroupingOperator`, so it is possible to write `default :and`, 
 passing in a symbol instead of an actual operator instance.
 - `#optional` marks a parameter that can take on `nil` value. Even a parameter 
-that has default defined can be marked optional. This might lead to seemingly 
-confusing situations but it actually presents a solution to some specific use cases 
-as explained in the [Populate data models](#models) section.
+that has default defined can be marked optional. This might lead to confusing 
+behaviour: such parameter, if set explicitly to `nil`, will ignore the input and 
+use the default anyway. On the other hand, the possibility to define default on 
+an optional parameter presents a solution to some specific use cases as explained 
+in the [Populate data models](#models) section.
 - `#no_input` creates a parameter that doesn’t read from non-local input
 (coming from the outside). An optional argument can be passed into the
 method call to be used as the default value. Another way to assign a value
@@ -55,7 +57,7 @@ used where a piece of information known at the current location needs to
 be passed over elsewhere in an URI variable.
 - `#no_output` prevents parameter from writing its value to non-local output (meaning
 output sent to other location).
-- `#local` parameter is marked both as `no_input` and `no_output`. You can think of local 
+- `#local` option marks a parameter both as `no_input` and `no_output`. You can think of local 
 parameters as instance variables on the parameter object with the advantage that they enjoy full 
 library support for type coercion, duplication, freeze, update and more. As with the `#no_input` 
 method, an optional default value is accepted.
@@ -140,7 +142,10 @@ the parameter neither has default defined nor it has been marked as optional.
 Other important methods common to all types of parameters include:
 - `#is_undefined?` – this returns true unless parameter has been 
 explicitly set (even to a `nil` value) or has a default (again, the default can be `nil`).
-- `#is_nil?` returns true if parameter is defined and its value is `nil`.
+Specific case is a default-having parameter marked as optional. When set to `nil` value
+explicitly, it will ignore the input and report it's state as undefined.
+- `#is_nil?` returns true if parameter is defined and its value is `nil`, or is undefined
+and it's default is `nil`.
 - `#is_definite?` returns true unless parameter is undefined or its value is `nil`.
 
 ### Updating parameters

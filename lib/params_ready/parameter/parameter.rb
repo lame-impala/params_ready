@@ -394,17 +394,17 @@ module ParamsReady
 
       def handle_indefinite_input(input, validator)
         value_missing validator
-        if optional?
+        if default_defined?
           # if value_missing doesn't crash,
           # and the parameter is optional
           # it's safe to set to nil or Extensions::Undefined
-          @value = input
-        elsif default_defined?
+          @value = Extensions::Undefined
+        elsif optional?
           # Clear possible previous state,
           # will be set to default on read
-          @value = Extensions::Undefined
+          @value = input
         else
-          raise ParamsReadyError, "Unexpected state in #handle_indefinite_input" if validator.ok?
+          raise ParamsReadyError, "Unexpected state for '#{name}' in #handle_indefinite_input" if validator.ok?
         end
       end
 

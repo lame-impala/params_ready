@@ -93,9 +93,8 @@ module ParamsReady
         assert_nil param.unwrap
         assert_equal 7, param.unwrap_or(7)
 
-
         param.set_value nil
-        refute param.is_undefined?
+        assert param.is_undefined?
         assert param.is_nil?
         refute param.is_definite?
         assert_nil param.unwrap
@@ -122,12 +121,12 @@ module ParamsReady
         assert_equal 5, param.unwrap_or(7)
 
         param.set_value nil
-        refute param.is_undefined?
-        assert param.is_nil?
-        refute param.is_definite?
+        assert param.is_undefined?
+        refute param.is_nil?
+        assert param.is_definite?
 
-        assert_nil param.unwrap
-        assert_equal 7, param.unwrap_or(7)
+        assert_equal 5, param.unwrap
+        assert_equal 5, param.unwrap_or(7)
 
         param.set_value 10
         refute param.is_undefined?

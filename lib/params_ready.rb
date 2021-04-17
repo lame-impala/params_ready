@@ -28,7 +28,7 @@ require_relative 'params_ready/query/variable_operator_predicate'
 
 
 module ParamsReady
-  VERSION = '0.0.5'.freeze
+  VERSION = '0.0.6'.freeze
 
   def self.gem_version
     ::Gem::Version.new(VERSION)

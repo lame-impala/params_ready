@@ -4,6 +4,70 @@ require_relative '../../lib/params_ready/input_context'
 
 module ParamsReady
   module Parameter
+    class BehaviourWithAttributesIntent < Minitest::Test
+      def test_nil_values_are_not_omitted_if_default_is_nil
+        d = Builder.define_hash(:parameter, altn: :parameter) do
+          add(:string, :detail) do
+            default 'N/A'
+          end
+          add(:string, :name) do
+            default nil
+          end
+        end
+
+        _, p = d.from_hash nil
+        assert_equal({ detail: 'N/A', name: nil }, p.for_model)
+      end
+
+      def test_undefined_values_are_omitted_from_attributes
+        d = get_complex_param_definition
+        _, p = d.from_hash(nil)
+        assert_equal({}, p.for_model)
+
+        exp = { detail: 'Info' }
+        format = Format.instance(:backend)
+        _, p = d.from_hash({ parameter: exp }, context: format)
+        assert_equal exp, p.for_model
+
+        exp[:roles] = [1, 2, 4]
+        _, p = d.from_hash({ parameter: exp }, context: format)
+        assert_equal exp, p.for_model
+
+        exp[:actions] = { view: true }
+        _, p = d.from_hash({ parameter: exp }, context: format)
+        assert_equal exp, p.for_model
+
+        exp[:actions][:edit] = true
+        _, p = d.from_hash({ parameter: exp }, context: format)
+        assert_equal exp, p.for_model
+
+        exp[:score] = [10, 3]
+        _, p = d.from_hash({ parameter: exp }, context: Format.instance(:backend))
+        assert_equal exp, p.for_model
+
+        exp[:evaluation] = { note: 'Ok'}
+        _, p = d.from_hash({ parameter: exp }, context: Format.instance(:backend))
+        assert_equal exp, p.for_model
+      end
+
+      def test_nil_values_are_not_omitted_from_attributes
+        d = get_complex_param_definition
+        _, p = d.from_hash(nil)
+        assert_equal({}, p.for_model)
+
+        exp = {
+          detail: nil,
+          roles: nil,
+          actions: { view: true, edit: nil },
+          score: nil,
+          evaluation: nil
+        }
+        _, p = d.from_hash({ parameter: exp }, context: Format.instance(:backend))
+        p.to_hash_if_eligible(Intent.instance(:frontend))
+        assert_equal exp, p.for_model
+      end
+    end
+
     class HashParameterForModelTest < Minitest::Test
       def get_def
         Builder.define_hash :model do
