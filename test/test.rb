@@ -28,6 +28,7 @@ require_relative 'pagination/tendency_test'
 
 require_relative 'parameter/array_parameter_test'
 require_relative 'parameter/hash_mapping_test'
+require_relative 'parameter/hash_parameter_for_model_test'
 require_relative 'parameter/hash_parameter_test'
 require_relative 'parameter/hash_set_parameter_test'
 require_relative 'parameter/input_output_locality_test'

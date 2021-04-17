@@ -254,6 +254,7 @@ module ParamsReady
 
       def is_definite?
         return true if @value != Extensions::Undefined && !@value.nil?
+        return false if optional? && @value.nil?
 
         definite_default?
       end
@@ -273,7 +274,13 @@ module ParamsReady
       end
 
       def is_undefined?
-        @value == Extensions::Undefined && !default_defined?
+        @value == Extensions::Undefined && allows_undefined?
+      end
+
+      def allows_undefined?
+        return true if optional?
+
+        !default_defined?
       end
 
       def eligible_for_output?(intent)

@@ -43,7 +43,10 @@ type is required. This has no reason other than to prevent unexpected
 conversion bugs. A few built-in parameters relax on this policy, namely 
 `Operator` and `GroupingOperator`, so it is possible to write `default :and`, 
 passing in a symbol instead of an actual operator instance.
-- `#optional` marks a parameter that can take on `nil` value.
+- `#optional` marks a parameter that can take on `nil` value. Even a parameter 
+that has default defined can be marked optional. This might lead to seemingly 
+confusing situations but it actually presents a solution to some specific use cases 
+as explained in the [Populate data models](#models) section.
 - `#no_input` creates a parameter that doesn’t read from non-local input
 (coming from the outside). An optional argument can be passed into the
 method call to be used as the default value. Another way to assign a value
@@ -924,19 +927,63 @@ Format.new(marshal: :none, omit: [], naming_scheme: :standard, remap: false, loc
 Format.new(marshal: :none, omit: %i(undefined), naming_scheme: :standard, remap: false, local: true, name: :update)
 ```
 
-This format uses standard naming scheme, declares its target as local, 
-and omits undefined parameters from output. Undefined parameters are those 
-marked as optional that haven’t been set to any value (even `nil`) during
-the initialization, either because the value was not present in the data
-or it has been rejected in the `#preprocess` callback.
+Both formats use standard naming scheme and declare their target as local.
+The only difference is that the `:update` format omits undefined parameters 
+from output. Undefined parameters are those marked as optional that haven’t 
+been set to any value (even `nil`) during the initialization, either because 
+the value was not present in the data or it has been rejected in the 
+`#preprocess` callback.
 
-We’ll use this feature in our first example. Let’s imagine a situation where we want
-to set the current user as the owner of the model we are creating or updating, 
-but only if we receive the user's id from an external authority via the context. 
-We can do this using a local parameter.
+We typically want to use the same parameter set for both create and update actions on 
+models. If we define some defaults for parameters that are not guaranteed to be present
+in the input data (in situations where some inputs are disabled for particular users), 
+we might want to use those defaults on create but not on update, where the 
+model presumably has all attributes already set to correct values. To prevent current 
+attribute values to be overwritten on update, we can mark default having parameters as optional 
+so that they are considered undefined if the value is missing from the input. 
+
+Consider this hash parameter holding attributes for a model:
+
+```ruby 
+definition = Builder.define_hash :model do
+  add :string, :name
+  add :integer, :role do
+    default 2
+    optional
+  end
+  add :integer, :ranking do
+    optional
+  end
+  add :integer, :owner_id do
+    default nil
+  end
+end
+```
+
+The only required parameter is `:name`, other have either default defined or 
+are optional (or both). We can expect all attributes to be set on create even if the
+input is incomplete:
+
+```ruby
+_, p = definition.from_input(name: 'Joe')
+assert_equal( { name: 'Joe', role: 2, ranking: nil, owner_id: nil }, p.for_model(:create))
+```
+
+On update, the parameter will nonetheless yield different result, omitting optional attributes:
+
+```ruby
+_, p = get_user_def.from_input(name: 'Joe')
+assert_equal( { name: 'Joe', owner_id: nil }, p.for_model(:update))
+```
+
+To illustrate the `#populate` callback, we'll modify the above example. The `:owner_id`
+attribute is no more read from input but is provided by some authority via the context.
+Also, instead of providing default, we mark it here as optional to prevent attribute value 
+to be overwritten to `nil` if user id is missing:
 
 ```ruby
 Builder.define_hash :model do
+  add :string, :name
   add :integer, :owner_id do
     local; optional
     populate do |context, parameter|
@@ -945,23 +992,22 @@ Builder.define_hash :model do
       parameter.set_value context[:user_id]
     end
   end
-  add :string, :name
 end
 
 context = InputContext.new(:frontend, { user_id: 5 })
 _, p = definition.from_input({ name: 'Foo' }, context: context)
-assert_equal({ owner_id: 5, name: 'Foo'}, p.for_model)
+assert_equal({ name: 'Foo', owner_id: 5}, p.for_model(:update))
 ```
 
 In the first case the value of the local parameter has been explicitly
-set and it subsequently appears in the output hash. But if the user id
+set and it subsequently appears in the output hash. If the user id
 is not found in the context, the parameter value is never set and it is excluded
 from output:
 
 ```ruby
 context = InputContext.new(:frontend, {})
 _, p = definition.from_input({ name: 'Foo' }, context: context)
-assert_equal({ name: 'Foo'}, p.for_model)
+assert_equal({ name: 'Foo'}, p.for_model(:update))
 ```
 
 Another example shows how data can be transformed in the `#preprocess` callback
@@ -983,7 +1029,7 @@ definition = Builder.define_hash :model do
 end
 
 _, p = definition.from_input({ to: 'a@ex.com; b@ex.com, c@ex.com, ', from: 'd@ex.com' })
-assert_equal({ to: %w[a@ex.com b@ex.com c@ex.com], from: 'd@ex.com' }, p.for_model)
+assert_equal({ to: %w[a@ex.com b@ex.com c@ex.com], from: 'd@ex.com' }, p.for_model(:create))
 ```
 
 In the last example we use a `#postprocess` block to alter the value of a parameter
@@ -1005,7 +1051,7 @@ definition = Builder.define_hash :model do
 end
 
 _, p = definition.from_input({ lower: 11, higher: 6 })
-assert_equal({ lower: 6, higher: 11 }, p.for_model)
+assert_equal({ lower: 6, higher: 11 }, p.for_model(:create))
 ``` 
 
 ### <a name='uri_variables'>URI variables</a>

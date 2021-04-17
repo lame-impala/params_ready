@@ -81,6 +81,62 @@ module ParamsReady
         assert_equal 10, param.unwrap_or(7)
       end
 
+      def test_state_accessors_work_with_optional_default_nil
+        param = Builder.define_integer(:role) do
+          default nil
+          optional
+        end.create
+
+        assert param.is_undefined?
+        assert param.is_nil?
+        refute param.is_definite?
+        assert_nil param.unwrap
+        assert_equal 7, param.unwrap_or(7)
+
+
+        param.set_value nil
+        refute param.is_undefined?
+        assert param.is_nil?
+        refute param.is_definite?
+        assert_nil param.unwrap
+        assert_equal 7, param.unwrap_or(7)
+
+        param.set_value 10
+        refute param.is_undefined?
+        refute param.is_nil?
+        assert param.is_definite?
+        assert_equal 10, param.unwrap
+        assert_equal 10, param.unwrap_or(7)
+      end
+
+      def test_state_accessors_work_with_definite_optional_default
+        param = Builder.define_integer(:role) do
+          default 5
+          optional
+        end.create
+
+        assert param.is_undefined?
+        refute param.is_nil?
+        assert param.is_definite?
+        assert_equal 5, param.unwrap
+        assert_equal 5, param.unwrap_or(7)
+
+        param.set_value nil
+        refute param.is_undefined?
+        assert param.is_nil?
+        refute param.is_definite?
+
+        assert_nil param.unwrap
+        assert_equal 7, param.unwrap_or(7)
+
+        param.set_value 10
+        refute param.is_undefined?
+        refute param.is_nil?
+        assert param.is_definite?
+        assert_equal 10, param.unwrap
+        assert_equal 10, param.unwrap_or(7)
+      end
+
       def test_state_accessors_work_with_non_optional_non_default_parameter
         param = Builder.define_integer(:role).create
 

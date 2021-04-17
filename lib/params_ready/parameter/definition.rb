@@ -208,17 +208,10 @@ module ParamsReady
         end
       end
 
-      late_init :optional, boolean: true, getter: false, once: false do |value|
-        next value if value == false
-        raise ParamsReadyError, "Optional parameter can't have default" if default_defined?
-
-        value
-      end
+      late_init :optional, boolean: true, getter: false, once: false
 
       late_init :default, once: false, definite: false do |value|
         next value if value == Extensions::Undefined
-
-        raise ParamsReadyError, "Optional parameter can't have default" if optional?
 
         canonical = canonical_default(value)
         next canonical if canonical.nil?

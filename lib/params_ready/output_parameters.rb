@@ -104,8 +104,8 @@ module ParamsReady
       @parameter.for_frontend(restriction: restriction, data: data)
     end
 
-    def for_model(restriction: @intent.restriction)
-      @parameter.for_model(restriction: restriction)
+    def for_model(format = :update, restriction: @intent.restriction)
+      @parameter.for_model(format, restriction: restriction)
     end
 
     def format(format = @intent)

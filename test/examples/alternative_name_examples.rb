@@ -15,7 +15,7 @@ module ParamsReady
         _, parameter = definition.from_input({ name: 'BAR' }, context: context)
         assert_equal({ name: 'BAR' }, parameter.unwrap)
 
-        hash = parameter.for_model
+        hash = parameter.for_model(:create)
         assert_equal({ name: 'BAR' }, hash)
         hash = parameter.for_output :backend
         assert_equal({ name: 'BAR' }, hash)
