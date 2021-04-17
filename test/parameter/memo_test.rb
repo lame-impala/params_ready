@@ -177,7 +177,7 @@ module ParamsReady
         r2 = p.for_model
         val, int = retrieve_cached_output(p)
         assert_equal r2.object_id, val.object_id
-        assert_equal Intent.instance(:attributes), int
+        assert_equal Intent.instance(:update), int
 
         f, r = get_intent
         r3 = p.for_output(f, restriction: r)

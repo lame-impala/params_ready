@@ -839,7 +839,7 @@ Format.define(:only_date, new_format)
 First argument is the identifier of the new format (not to be confused with the `@name` 
 instance variable). Format object created this way can be obtained later 
 using `Format.instance(:only_date)`. It is also possible to redefine existing formats
-this way, such as `:frontend`, `:json`, `:backend` and `:attributes`.
+this way, such as `:frontend`, `:json`, `:backend`, `:create` and `:update`.
 
 ### Restriction
 Sometimes we need to decide dynamically what particular parameters to include in or omit from output. 
@@ -916,11 +916,12 @@ entrance point into the application.
  
 In this section we’ll show some advanced ways to prepare 
 data to be passed over to the models. First we need to get familiar 
-with the `:attributes` format that is constructed to 
-meet model requirements. Here is the definition:
+with the `:create` and `:update` formats constructed to 
+meet model requirements. Here is are the definitions:
 
 ```ruby
-Format.new(marshal: :none, omit: %i(undefined), naming_scheme: :standard, remap: false, local: true, name: :attributes)
+Format.new(marshal: :none, omit: [], naming_scheme: :standard, remap: false, local: true, name: :create)
+Format.new(marshal: :none, omit: %i(undefined), naming_scheme: :standard, remap: false, local: true, name: :update)
 ```
 
 This format uses standard naming scheme, declares its target as local, 

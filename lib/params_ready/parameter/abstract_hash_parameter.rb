@@ -69,7 +69,7 @@ module ParamsReady
         for_output(format, restriction: restriction, data: data)
       end
 
-      def for_model(format = :attributes, restriction: nil)
+      def for_model(format = :update, restriction: nil)
         for_output(format, restriction: restriction)
       end
 
