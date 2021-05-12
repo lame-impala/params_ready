@@ -43,12 +43,10 @@ type is required. This has no reason other than to prevent unexpected
 conversion bugs. A few built-in parameters relax on this policy, namely 
 `Operator` and `GroupingOperator`, so it is possible to write `default :and`, 
 passing in a symbol instead of an actual operator instance.
-- `#optional` marks a parameter that can take on `nil` value. Even a parameter 
-that has default defined can be marked optional. This might lead to confusing 
-behaviour: such parameter, if set explicitly to `nil`, will ignore the input and 
-use the default anyway. On the other hand, the possibility to define default on 
-an optional parameter presents a solution to some specific use cases as explained 
-in the [Populate data models](#models) section.
+- `#optional` marks a parameter that can take on `nil` value in the elementary case. 
+In specific contexts though, this flag has a slightly different meaning. 
+See [Populate data models](#models) and [Array Parameter](#array-parameter)
+for details.
 - `#no_input` creates a parameter that doesn’t read from non-local input
 (coming from the outside). An optional argument can be passed into the
 method call to be used as the default value. Another way to assign a value
@@ -137,7 +135,8 @@ receive a completely independent unfrozen copy.
 ### Accessor methods
 - Use `#unwrap` to retrieve value. This will raise if value hasn’t been set and 
 the parameter neither has default defined nor it has been marked as optional. 
-- There is a failsafe alternative method `#unwrap_or(default)` 
+- There is a failsafe alternative method `#unwrap_or(default)`. Block can
+be supplied instead of an argument to compute default value.
 
 Other important methods common to all types of parameters include:
 - `#is_undefined?` – this returns true unless parameter has been 
@@ -458,7 +457,7 @@ end.create
 assert_equal({ int: 5, str: nil }, parameter.unwrap)
 ```
 
-### Array parameter
+### <a name="array-parameter">Array parameter</a>
 Array parameter can hold an indefinite number of homogeneous values of both 
 primitive and complex types.
 In Rails, arrays received in the URI variables end up being represented as hashes 
@@ -861,6 +860,7 @@ prohibiting the children parameters, possibly going on to arbitrary depth.
 Let’s see an illustration of this in code:
 
 ```ruby
+definition = Builder.define_hash :parameter do
   add :string, :allowed
   add :integer, :disallowed
   add :hash, :allowed_as_a_whole do

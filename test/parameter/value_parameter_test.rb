@@ -49,6 +49,32 @@ module ParamsReady
         assert_equal p1a, p1b
         refute_equal p1a, p2
       end
+
+      def test_unwrap_or_raises_if_default_nor_block_are_present
+        p = get_def(:string, :parameter, :prm).create
+        err = assert_raises(ParamsReadyError) do
+          p.unwrap_or :foo, :bar
+        end
+        assert_equal 'Single default value expected', err.message
+      end
+
+      def test_unwrap_or_raises_if_multiple_defaults_are_present
+        p = get_def(:string, :parameter, :prm).create
+        err = assert_raises(ParamsReadyError) do
+          p.unwrap_or
+        end
+        assert_equal 'Supply either default or a block', err.message
+      end
+
+      def test_block_supersedes_default_in_unwrap_or
+        p = get_def(:string, :parameter, :prm).create
+        Kernel.silence_warnings do
+          result = p.unwrap_or('foo') do
+            'bar'
+          end
+          assert_equal 'bar', result
+        end
+      end
     end
 
     class ValueParameterConstraintTest < Minitest::Test

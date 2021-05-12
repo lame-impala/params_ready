@@ -548,7 +548,7 @@ module ParamsReady
         assert_equal 'param: value is nil', err.message
       end
 
-      def test_does_not_raise_using_unwrap_or
+      def test_does_not_raise_using_unwrap_or_with_default
         d = get_def
 
         r, p = d.from_input({ nested: { number: 5 }})
@@ -556,6 +556,20 @@ module ParamsReady
         exp = { nested: { integer: 5, text: 'foo' }}
 
         res = p.unwrap_or(exp)
+
+        assert_equal exp, res
+      end
+
+      def test_does_not_raise_using_unwrap_or_with_block
+        d = get_def
+
+        r, p = d.from_input({ nested: { number: 5 }})
+        refute r.ok?
+        exp = { nested: { integer: 11, text: 'bar' }}
+
+        res = p.unwrap_or do
+          exp
+        end
 
         assert_equal exp, res
       end

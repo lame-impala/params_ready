@@ -347,14 +347,18 @@ module ParamsReady
         format(Intent.instance(:backend))
       end
 
-      def unwrap_or(default)
+      def unwrap_or(*args, &block)
+        ensure_default_present!(*args, &block)
+
         if is_definite?
-          unwrap
+          begin
+            unwrap
+          rescue StandardError => _
+            supply_default(*args, &block)
+          end
         else
-          default
+          supply_default(*args, &block)
         end
-      rescue StandardError => _
-        default
       end
 
       def find_in_hash(hash, context)
@@ -430,6 +434,20 @@ module ParamsReady
 
         value_missing
         nil
+      end
+
+      def ensure_default_present!(*args, &block)
+        raise ParamsReadyError, 'Single default value expected' if args.length > 1
+        raise ParamsReadyError, 'Supply either default or a block' if args.length == 0 && block.nil?
+        warn 'WARNING: block supersedes default value' if args.length > 0 && block
+      end
+
+      def supply_default(*args, &block)
+        if block.nil?
+          args[0]
+        else
+          block.call
+        end
       end
 
       def init_for_read(to_be_frozen = false)
