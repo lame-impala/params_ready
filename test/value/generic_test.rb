@@ -63,6 +63,11 @@ module ParamsReady
         Parameter::ValueParameterBuilder.register_coder :instantiable, CoderFactory
       end
 
+      def test_responds_to_value_class_name
+        c = CoderFactory.new(value_class: DummyObject)
+        assert_equal 'Factory', c.value_class_name
+      end
+
       def test_works_as_a_child_in_hash_parameter
         d = Builder.define_hash :hash do
           add :instantiable, :instantiable, value_class: DummyObject

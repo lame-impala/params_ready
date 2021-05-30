@@ -53,9 +53,12 @@ module ParamsReady
         def strict_default?
           self.class.strict_default?
         end
+
+        def value_class_name
+          self.class.value_class_name
+        end
       end
     end
-
 
     class GenericCoder
       extend Extensions::LateInit

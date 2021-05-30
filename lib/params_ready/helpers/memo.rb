@@ -21,7 +21,6 @@ module ParamsReady
       end
 
       def cache_value(value, key)
-
         stale = @cache
         return if stale&.key? key
 
