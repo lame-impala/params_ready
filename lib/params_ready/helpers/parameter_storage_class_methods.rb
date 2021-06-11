@@ -31,6 +31,18 @@ module ParamsReady
           raise ParamsReadyError, "Unknown parameter '#{sym_key}'"
         end
       end
+
+      def include_parameters(parameter_definer)
+        parameter_definer.all_parameters.values.each do |p|
+          params_ready_storage.add_parameter(p)
+        end
+      end
+
+      def include_relations(parameter_definer)
+        parameter_definer.all_relations.values.each do |d|
+          params_ready_storage.add_relation(d)
+        end
+      end
     end
   end
 end

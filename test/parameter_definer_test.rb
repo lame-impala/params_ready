@@ -54,6 +54,27 @@ module ParamsReady
     end
   end
 
+  class D
+    include ParameterDefiner
+
+    include_parameters B
+    include_relations C
+  end
+
+  class ParameterDefinerInclusionTest < Minitest::Test
+    def test_definer_can_include_parameters
+      dparams = D.all_parameters
+      assert_equal(:b, dparams[:parb].altn)
+      assert_equal(:str, dparams[:string].altn)
+    end
+
+    def test_definer_can_include_relations
+      drel = D.all_relations
+      assert_equal(:pts, drel[:posts].altn)
+      assert_equal(:usr, drel[:users].altn)
+    end
+  end
+
   class ParameterDefinerInheritanceTest < Minitest::Test
     def test_param_inheritance_works
       c = C
