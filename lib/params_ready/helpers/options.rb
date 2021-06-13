@@ -12,6 +12,12 @@ module ParamsReady
         @memo = { parameters: {}, relations: {}}
       end
 
+      def reset_memo!(*args)
+        args.each do |key|
+          @memo[key].clear
+        end
+      end
+
       def dup
         duplicate = Options.new
         @parameter_rules.each do |_, rule|
@@ -45,6 +51,7 @@ module ParamsReady
       end
 
       def merge_parameter_rule(rule)
+        reset_memo!(:parameters)
         @parameter_rules = self.class.merge_rule(rule, @parameter_rules)
       end
 
@@ -54,6 +61,7 @@ module ParamsReady
       end
 
       def merge_relation_rule(rule)
+        reset_memo!(:relations)
         @relation_rules = self.class.merge_rule(rule, @relation_rules)
       end
 

@@ -85,6 +85,28 @@ class InterfaceDefinerTest < Minitest::Test
     assert_equal rr, memo[:relations][:index]
   end
 
+  def test_action_memo_reset_when_parameter_rule_added
+    opt = SubController.params_ready_option.dup
+    memo = opt.instance_variable_get(:@memo)
+    memo[:relations][:index] = :BOO
+    relation = Minitest::Mock.new
+    relation.expect(:name, :subscriptions)
+    relation.expect(:name, :subscriptions)
+    opt.use_relation relation
+    assert_nil memo[:relations][:index]
+  end
+
+  def test_action_memo_reset_when_relation_rule_added
+    opt = SubController.params_ready_option.dup
+    memo = opt.instance_variable_get(:@memo)
+    memo[:parameters][:index] = :BOO
+    parameter = Minitest::Mock.new
+    parameter.expect(:name, :other)
+    parameter.expect(:name, :other)
+    opt.use_parameter parameter
+    assert_nil memo[:parameters][:index]
+  end
+
   def test_usage_rules_are_created_using_block
     assert_rules(BlockDefinitionController)
   end
