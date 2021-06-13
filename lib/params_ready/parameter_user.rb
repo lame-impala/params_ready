@@ -15,11 +15,11 @@ module ParamsReady
     protected
 
     def parameter_definition(key)
-        self.class.parameter_definition key
+      self.class.parameter_definition key
     end
 
     def relation_definition(key)
-        self.class.relation_definition key
+      self.class.relation_definition key
     end
 
     def populate_state_for(method, params, context = Format.instance(:frontend), validator = nil)
@@ -30,12 +30,12 @@ module ParamsReady
 
     def create_state_for(method)
       builder = Parameter::StateBuilder.instance
-      options = self.class.params_ready_storage
-      options.parameter_rules do |rule|
-        builder.add rule.parameter_definition if rule.valid_for?(method)
+      options = self.class.params_ready_option
+      options.parameter_definitions_for(method).each do |definition|
+        builder.add definition
       end
-      options.relation_rules do |rule|
-        builder.relation rule.parameter_definition if rule.valid_for?(method)
+      options.relation_definitions_for(method).each do |definition|
+        builder.relation definition
       end
       builder.build
     end

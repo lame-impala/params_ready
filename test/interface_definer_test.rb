@@ -36,28 +36,60 @@ class NamedArgumentsDefinitionController
   action_interface(:mass, parameter: :string, parameters: [:complex], relations: [:posts])
 end
 
+class SuperController
+  include ParamsReady::ParameterUser
+  include_parameters A
+  include_relations A
+
+  use_relation :users
+  use_parameter :number
+
+  action_interface(:update) do
+    parameter :complex
+  end
+
+  action_interface(:index) do
+    relation :posts
+  end
+
+  action_interface(:mass) do
+    parameters :string
+    relations :posts
+  end
+end
+
+class SubController < SuperController
+  action_interface(:create, parameter: :complex)
+  action_interface(:index, parameter: :string)
+  action_interface(:mass, parameter: :complex)
+end
+
 class InterfaceDefinerTest < Minitest::Test
+  def test_usage_rules_are_inherited
+    assert_rules(SubController)
+  end
+
   def test_usage_rules_are_created_using_block
-    assert_named_arguments(BlockDefinitionController)
+    assert_rules(BlockDefinitionController)
   end
 
   def test_usage_rules_are_created_using_named_arguments
-    assert_named_arguments(NamedArgumentsDefinitionController)
+    assert_rules(NamedArgumentsDefinitionController)
   end
 
-  def assert_named_arguments(controller)
-    opt = controller.params_ready_storage
+  def assert_rules(controller)
+    opt = controller.params_ready_option
     p_rules = opt.parameter_rules
-    assert_equal [:number, :complex, :string], p_rules.keys
+    assert_equal [:number, :complex, :string].to_set, p_rules.keys.to_set
     assert_equal :all, p_rules.values[0].rule.mode
     assert_equal :only, p_rules.values[1].rule.mode
-    assert_equal [:mass, :create, :update], p_rules.values[1].rule.values.to_a
+    assert_equal [:mass, :create, :update].to_set, p_rules.values[1].rule.values.to_set
     assert_equal :only, p_rules.values[2].rule.mode
-    assert_equal [:mass, :index], p_rules.values[2].rule.values.to_a
+    assert_equal [:mass, :index].to_set, p_rules.values[2].rule.values.to_set
     r_rules = opt.relation_rules
-    assert_equal [:users, :posts], r_rules.keys
+    assert_equal [:users, :posts].to_set, r_rules.keys.to_set
     assert_equal :all, r_rules.values[0].rule.mode
     assert_equal :only, r_rules.values[1].rule.mode
-    assert_equal [:mass, :index], r_rules.values[1].rule.values.to_a
+    assert_equal [:mass, :index].to_set, r_rules.values[1].rule.values.to_set
   end
 end
