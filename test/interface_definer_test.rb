@@ -16,6 +16,11 @@ class InterfaceDefiningController
     use_parameter :string
     use_relation :posts
   end
+
+  action_interface(:mass) do
+    use_parameters :string, :complex
+    use_relations :posts
+  end
 end
 
 class InterfaceDefinerTest < Minitest::Test
@@ -25,13 +30,13 @@ class InterfaceDefinerTest < Minitest::Test
     assert_equal [:number, :complex, :string], p_rules.keys
     assert_equal :all, p_rules.values[0].rule.mode
     assert_equal :only, p_rules.values[1].rule.mode
-    assert_equal [:create, :update], p_rules.values[1].rule.values.to_a
+    assert_equal [:mass, :create, :update], p_rules.values[1].rule.values.to_a
     assert_equal :only, p_rules.values[2].rule.mode
-    assert_equal [:index], p_rules.values[2].rule.values.to_a
+    assert_equal [:mass, :index], p_rules.values[2].rule.values.to_a
     r_rules = opt.relation_rules
     assert_equal [:users, :posts], r_rules.keys
     assert_equal :all, r_rules.values[0].rule.mode
     assert_equal :only, r_rules.values[1].rule.mode
-    assert_equal [:index], r_rules.values[1].rule.values.to_a
+    assert_equal [:mass, :index], r_rules.values[1].rule.values.to_a
   end
 end
