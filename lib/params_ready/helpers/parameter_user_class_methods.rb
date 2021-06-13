@@ -17,9 +17,10 @@ module ParamsReady
         params_ready_storage.use_relation relation, rule
       end
 
-      def action_interface(*action_names, &block)
+      def action_interface(*action_names, **opts, &block)
         definer = InterfaceDefiner.new(action_names, self)
-        definer.define(&block)
+
+        definer.define(**opts, &block)
       end
     end
   end

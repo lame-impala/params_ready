@@ -26,9 +26,22 @@ module ParamsReady
         @user.use_relation(name, only: @action_names)
       end
 
-      def define(&block)
-        instance_eval(&block)
+      def define(parameter: nil, relation: nil, parameters: [], relations: [], &block)
+        parameters = self.class.complete_list(parameter, parameters)
+        parameters(*parameters)
+        relations = self.class.complete_list(relation, relations)
+        relations(*relations)
+        instance_eval(&block) unless block.nil?
         @option
+      end
+
+      def self.complete_list(singular, plural)
+        list = singular.nil? ? plural : [singular, *plural]
+        normalize_list(list)
+      end
+
+      def self.normalize_list(list)
+        list.map(&:to_sym)
       end
     end
   end

@@ -1,6 +1,6 @@
 require_relative 'params_ready_test_helper'
 
-class InterfaceDefiningController
+class BlockDefinitionController
   include ParamsReady::ParameterUser
   include_parameters A
   include_relations A
@@ -23,9 +23,30 @@ class InterfaceDefiningController
   end
 end
 
+class NamedArgumentsDefinitionController
+  include ParamsReady::ParameterUser
+  include_parameters A
+  include_relations A
+
+  use_relation :users
+  use_parameter :number
+
+  action_interface(:create, :update, parameter: :complex)
+  action_interface(:index, parameter: :string, relation: :posts)
+  action_interface(:mass, parameter: :string, parameters: [:complex], relations: [:posts])
+end
+
 class InterfaceDefinerTest < Minitest::Test
-  def test_usage_rules_are_created
-    opt = InterfaceDefiningController.params_ready_storage
+  def test_usage_rules_are_created_using_block
+    assert_named_arguments(BlockDefinitionController)
+  end
+
+  def test_usage_rules_are_created_using_named_arguments
+    assert_named_arguments(NamedArgumentsDefinitionController)
+  end
+
+  def assert_named_arguments(controller)
+    opt = controller.params_ready_storage
     p_rules = opt.parameter_rules
     assert_equal [:number, :complex, :string], p_rules.keys
     assert_equal :all, p_rules.values[0].rule.mode
