@@ -69,6 +69,22 @@ class InterfaceDefinerTest < Minitest::Test
     assert_rules(SubController)
   end
 
+  def test_parameters_for_actions_are_memoized
+    opt = SubController.params_ready_option.dup
+    memo = opt.instance_variable_get(:@memo)
+    assert_nil memo[:parameters][:index]
+    pp = opt.parameter_definitions_for(:index)
+    assert_equal pp, memo[:parameters][:index]
+  end
+
+  def test_relations_for_actions_are_memoized
+    opt = SubController.params_ready_option.dup
+    memo = opt.instance_variable_get(:@memo)
+    assert_nil memo[:parameters][:index]
+    rr = opt.relation_definitions_for(:index)
+    assert_equal rr, memo[:relations][:index]
+  end
+
   def test_usage_rules_are_created_using_block
     assert_rules(BlockDefinitionController)
   end
