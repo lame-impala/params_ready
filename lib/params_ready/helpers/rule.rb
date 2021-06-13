@@ -6,31 +6,50 @@ module ParamsReady
       return input if input.nil?
       return input if input.is_a? Rule
 
-      Rule.new(input).freeze
+      Rule.instance(input).freeze
     end
 
     class Rule
-      attr_reader :hash
+      attr_reader :hash, :mode, :values
 
-      def initialize(value)
-        @mode, @values = case value
-        when :none, :all then [value, nil]
+      def self.instance(input)
+        mode, values = case input
+        when :none, :all then [input, nil]
         when Hash
-          if value.length > 1 || value.length < 1
-            raise ParamsReadyError, "Unexpected hash for rule: '#{value}'"
+          if input.length > 1 || input.length < 1
+            raise ParamsReadyError, "Unexpected hash for rule: '#{input}'"
           end
-          key, values = value.first
+          key, values = input.first
           case key
           when :except, :only then [key, values.to_set.freeze]
           else
             raise ParamsReadyError, "Unexpected mode for rule: '#{key}'"
           end
         else
-          raise ParamsReadyError, "Unexpected input for rule: '#{value}'"
+          raise ParamsReadyError, "Unexpected input for rule: '#{input}'"
         end
-        @values.freeze
+        new(mode, values)
+      end
+
+      def initialize(mode, values)
+        @mode = mode
+        @values = values.freeze
         @hash = [@mode, @values].hash
         freeze
+      end
+
+      def merge(other)
+        return self if other.nil?
+        raise ParamsReadyError, "Can't merge with #{other.class.name}" unless other.is_a? Rule
+        raise ParamsReadyError, "Can't merge incompatible rules: #{mode}/#{other.mode}" if other.mode != mode
+
+        case mode
+        when :all, :none
+          self
+        when :only, :except
+          values = self.values + other.values
+          Rule.new(mode, values)
+        end
       end
 
       def include?(name)

@@ -15,7 +15,7 @@ module ParamsReady
     def test_update_with_params_returns_updated_object
       f = Format.new(marshal: { only: [:value, :number] }, omit: [:undefined], naming_scheme: :alternative, remap: true, local: false, name: :old)
       updated = f.update(marshal: { except: [:array] }, omit: [:nil, :undefined], naming_scheme: :standard, remap: false, local: true, name: :new)
-      assert_equal(Helpers::Rule.new(except: [:array]), updated.instance_variable_get(:@marshal))
+      assert_equal(Helpers::Rule.instance(except: [:array]), updated.instance_variable_get(:@marshal))
       assert_equal([:nil, :undefined].to_set, updated.instance_variable_get(:@omit))
       assert_equal(:standard, updated.instance_variable_get(:@naming_scheme))
       assert_equal(false, updated.instance_variable_get(:@remap))

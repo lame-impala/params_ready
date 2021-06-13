@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     lib/params_ready/helpers/arel_builder.rb
     lib/params_ready/helpers/conditional_block.rb
     lib/params_ready/helpers/find_in_hash.rb
+    lib/params_ready/helpers/interface_definer.rb
     lib/params_ready/helpers/key_map.rb
     lib/params_ready/helpers/memo.rb
     lib/params_ready/helpers/options.rb

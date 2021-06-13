@@ -1,3 +1,5 @@
+require_relative 'interface_definer'
+
 module ParamsReady
   module Helpers
     module ParameterUserClassMethods
@@ -13,6 +15,11 @@ module ParamsReady
       def use_relation(name, rule = :all)
         relation = relation_definition name
         params_ready_storage.use_relation relation, rule
+      end
+
+      def action_interface(*action_names, &block)
+        definer = InterfaceDefiner.new(action_names, self)
+        definer.define(&block)
       end
     end
   end

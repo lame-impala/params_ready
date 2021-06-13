@@ -32,10 +32,10 @@ module ParamsReady
       builder = Parameter::StateBuilder.instance
       options = self.class.params_ready_storage
       options.parameter_rules do |rule|
-        builder.add rule.parameter_definition if rule.valid_for(method)
+        builder.add rule.parameter_definition if rule.valid_for?(method)
       end
       options.relation_rules do |rule|
-        builder.relation rule.parameter_definition if rule.valid_for(method)
+        builder.relation rule.parameter_definition if rule.valid_for?(method)
       end
       builder.build
     end

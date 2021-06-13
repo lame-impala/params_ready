@@ -15,24 +15,37 @@ module ParamsReady
 
       def use_parameter(param, rule_args = :all)
         rule = UsageRule.new(param, rule_args)
-        @parameter_rules[param.name] = rule
+        @parameter_rules = self.class.merge_rule(rule, @parameter_rules)
       end
 
       def use_relation(relation, rule_args = :all)
         rule = UsageRule.new(relation, rule_args)
-        @relation_rules[relation.name] = rule
+        @relation_rules = self.class.merge_rule(rule, @relation_rules)
       end
 
       def parameter_rules
-        @parameter_rules.each_value do |rule|
-          yield rule
+        if block_given?
+          @parameter_rules.each_value do |rule|
+            yield rule
+          end
         end
+        @parameter_rules
       end
 
       def relation_rules
-        @relation_rules.each_value do |rule|
-          yield rule
+        if block_given?
+          @relation_rules.each_value do |rule|
+            yield rule
+          end
         end
+        @relation_rules
+      end
+
+      def self.merge_rule(rule, rules)
+        existing = rules[rule.name]
+        merged = rule.merge(existing)
+        rules[rule.name] = merged
+        rules
       end
     end
   end
