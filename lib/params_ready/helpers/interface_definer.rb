@@ -6,23 +6,23 @@ module ParamsReady
         @user = user
       end
 
-      def use_parameters(*names)
+      def parameters(*names)
         names.each do |name|
-          use_parameter(name)
+          parameter(name)
         end
       end
 
-      def use_relations(*names)
+      def relations(*names)
         names.each do |name|
-          use_relation(name)
+          relation(name)
         end
       end
 
-      def use_parameter(name)
+      def parameter(name)
         @user.use_parameter(name, only: @action_names)
       end
 
-      def use_relation(name)
+      def relation(name)
         @user.use_relation(name, only: @action_names)
       end
 

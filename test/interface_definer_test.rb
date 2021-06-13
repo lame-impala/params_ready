@@ -9,17 +9,17 @@ class InterfaceDefiningController
   use_parameter :number
 
   action_interface(:create, :update) do
-    use_parameter :complex
+    parameter :complex
   end
 
   action_interface(:index) do
-    use_parameter :string
-    use_relation :posts
+    parameter :string
+    relation :posts
   end
 
   action_interface(:mass) do
-    use_parameters :string, :complex
-    use_relations :posts
+    parameters :string, :complex
+    relations :posts
   end
 end
 
