@@ -2064,6 +2064,26 @@ class UsersController < ApplicationController
 end
 ```
 
+An alternative way to declare usage is the `#action_interface` method. 
+You can pass individual parameter and relation names or list of those names 
+to the method as named arguments or you can call singular- or plural-named methods 
+in a block: 
+
+```ruby
+# using named arguments
+class UsersController < ApplicationController
+  action_interface(:create, :update, parameter: :user, relations: [:users, :posts])
+end
+
+# using a block:
+class UsersController < ApplicationController
+  action_interface(:create, :update) do 
+    parameter :user 
+    relations :users, :posts
+  end
+end
+```
+
 We’ll now show an implementation of the concept mentioned above in the [URI variables](#uri_variables) 
 section. We want to have a posts controller that would retain information received from the users
 controller along with its own filters, ordering, and pagination, and inject these data into links leading
