@@ -24,6 +24,14 @@ class ParamDefinitionsInheritanceTest < Minitest::Test
   end
 end
 
+class PickyUser
+  include ParamsReady::ParameterUser
+  include ParamsReady::ParameterDefiner
+
+  include_parameters(A, only: [:string])
+  include_relations(A, only: [:users])
+end
+
 class ParameterUserTest < Minitest::Test
   def with_users(*user_classes)
     user_classes.each do |user_class|
@@ -71,6 +79,14 @@ class ParameterUserTest < Minitest::Test
       child = prm[name]
       refute_param_frozen(child)
     end
+  end
+
+  def test_parameters_included_with_only_filter
+    assert_equal [:string], PickyUser.all_parameters.keys
+  end
+
+  def test_relations_included_with_only_filter
+    assert_equal [:users], PickyUser.all_relations.keys
   end
 
   def test_parameters_retrieved_correctly_for_single_relation

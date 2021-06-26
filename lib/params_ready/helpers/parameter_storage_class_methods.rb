@@ -32,8 +32,11 @@ module ParamsReady
         end
       end
 
-      def include_parameters(parameter_definer)
-        parameter_definer.all_parameters.values.each do |definition|
+      def include_parameters(parameter_definer, only: nil)
+        only = only&.to_set
+        parameter_definer.all_parameters.each do |key, definition|
+          next if only && !only.member?(key)
+
           add_parameter(definition)
         end
       end
@@ -42,8 +45,11 @@ module ParamsReady
         params_ready_storage.add_parameter(definition)
       end
 
-      def include_relations(parameter_definer)
-        parameter_definer.all_relations.values.each do |definition|
+      def include_relations(parameter_definer, only: nil)
+        only = only&.to_set
+        parameter_definer.all_relations.each do |key, definition|
+          next if only && !only.member?(key)
+
           add_relation(definition)
         end
       end
