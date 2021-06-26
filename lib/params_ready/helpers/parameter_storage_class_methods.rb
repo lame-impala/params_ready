@@ -33,15 +33,23 @@ module ParamsReady
       end
 
       def include_parameters(parameter_definer)
-        parameter_definer.all_parameters.values.each do |p|
-          params_ready_storage.add_parameter(p)
+        parameter_definer.all_parameters.values.each do |definition|
+          add_parameter(definition)
         end
       end
 
+      def add_parameter(definition)
+        params_ready_storage.add_parameter(definition)
+      end
+
       def include_relations(parameter_definer)
-        parameter_definer.all_relations.values.each do |d|
-          params_ready_storage.add_relation(d)
+        parameter_definer.all_relations.values.each do |definition|
+          add_relation(definition)
         end
+      end
+
+      def add_relation(definition)
+        params_ready_storage.add_relation(definition)
       end
     end
   end
