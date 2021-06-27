@@ -22,22 +22,14 @@ module ParamsReady
       self.class.relation_definition key
     end
 
-    def populate_state_for(method, params, context = Format.instance(:frontend), validator = nil)
-      definition = create_state_for method
+    def populate_state_for(key, params, context = Format.instance(:frontend), validator = nil)
+      definition = create_state_for key
       result, state = definition.from_input(params || {}, context: context, validator: validator || Result.new(:params_ready))
       [result, state]
     end
 
-    def create_state_for(method)
-      builder = Parameter::StateBuilder.instance
-      options = self.class.params_ready_option
-      options.parameter_definitions_for(method).each do |definition|
-        builder.add definition
-      end
-      options.relation_definitions_for(method).each do |definition|
-        builder.relation definition
-      end
-      builder.build
+    def create_state_for(key)
+      self.class.params_ready_option.create_state_for(key)
     end
   end
 end

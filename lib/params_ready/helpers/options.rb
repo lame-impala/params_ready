@@ -9,7 +9,7 @@ module ParamsReady
       def initialize
         @parameter_rules = Hash.new
         @relation_rules = Hash.new
-        @memo = { parameters: {}, relations: {}}
+        @memo = { definitions: {} }
       end
 
       def reset_memo!(*args)
@@ -30,11 +30,11 @@ module ParamsReady
       end
 
       def relation_definitions_for(name)
-        @memo[:relations][name] ||= definitions_for(name, relation_rules)
+        definitions_for(name, relation_rules)
       end
 
       def parameter_definitions_for(name)
-        @memo[:parameters][name] ||= definitions_for(name, parameter_rules)
+        definitions_for(name, parameter_rules)
       end
 
       def definitions_for(name, rules)
@@ -51,7 +51,7 @@ module ParamsReady
       end
 
       def merge_parameter_rule(rule)
-        reset_memo!(:parameters)
+        reset_memo!(:definitions)
         @parameter_rules = self.class.merge_rule(rule, @parameter_rules)
       end
 
@@ -61,7 +61,7 @@ module ParamsReady
       end
 
       def merge_relation_rule(rule)
-        reset_memo!(:relations)
+        reset_memo!(:definitions)
         @relation_rules = self.class.merge_rule(rule, @relation_rules)
       end
 
@@ -81,6 +81,19 @@ module ParamsReady
           end
         end
         @relation_rules
+      end
+
+      def create_state_for(key)
+        @memo[:definitions][key] ||= begin
+          builder = Parameter::StateBuilder.instance
+          parameter_definitions_for(key).each do |definition|
+            builder.add definition
+          end
+          relation_definitions_for(key).each do |definition|
+            builder.relation definition
+          end
+          builder.build
+        end
       end
 
       def self.merge_rule(rule, rules)

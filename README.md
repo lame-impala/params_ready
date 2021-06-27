@@ -50,7 +50,7 @@ for details.
 - `#no_input` creates a parameter that doesn’t read from non-local input
 (coming from the outside). An optional argument can be passed into the
 method call to be used as the default value. Another way to assign a value
-to the parameter is the `#populate` callback. A no-output parameter may be
+to the parameter is the `#populate` callback. A no-input parameter may be
 used where a piece of information known at the current location needs to
 be passed over elsewhere in a URI variable.
 - `#no_output` prevents parameter from writing its value to non-local output (meaning
