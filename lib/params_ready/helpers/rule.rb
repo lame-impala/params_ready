@@ -9,7 +9,7 @@ module ParamsReady
       Rule.instance(input).freeze
     end
 
-    class Rule
+      class Rule
       attr_reader :hash, :mode, :values
 
       def self.instance(input)

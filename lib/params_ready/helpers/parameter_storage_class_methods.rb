@@ -1,5 +1,6 @@
 require_relative 'storage'
 require_relative '../error'
+require_relative 'rule'
 
 module ParamsReady
   module Helpers
@@ -32,10 +33,10 @@ module ParamsReady
         end
       end
 
-      def include_parameters(parameter_definer, only: nil)
-        only = only&.to_set
+      def include_parameters(parameter_definer, rule = nil)
+        rule = Helpers::Rule(rule)
         parameter_definer.all_parameters.each do |key, definition|
-          next if only && !only.member?(key)
+          next if rule && !rule.include?(key)
 
           add_parameter(definition)
         end
@@ -45,10 +46,10 @@ module ParamsReady
         params_ready_storage.add_parameter(definition)
       end
 
-      def include_relations(parameter_definer, only: nil)
-        only = only&.to_set
+      def include_relations(parameter_definer, rule = nil)
+        rule = Helpers::Rule(rule)
         parameter_definer.all_relations.each do |key, definition|
-          next if only && !only.member?(key)
+          next if rule && !rule.include?(key)
 
           add_relation(definition)
         end

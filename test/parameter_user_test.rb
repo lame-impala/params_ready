@@ -32,6 +32,14 @@ class PickyUser
   include_relations(A, only: [:users])
 end
 
+class GreedyUser
+  include ParamsReady::ParameterUser
+  include ParamsReady::ParameterDefiner
+
+  include_parameters(A, except: [:string])
+  include_relations(A, except: [:users])
+end
+
 class ParameterUserTest < Minitest::Test
   def with_users(*user_classes)
     user_classes.each do |user_class|
@@ -81,12 +89,20 @@ class ParameterUserTest < Minitest::Test
     end
   end
 
-  def test_parameters_included_with_only_filter
+  def test_parameters_included_with_only_rule
     assert_equal [:string], PickyUser.all_parameters.keys
   end
 
-  def test_relations_included_with_only_filter
+  def test_relations_included_with_only_rule
     assert_equal [:users], PickyUser.all_relations.keys
+  end
+
+  def test_parameters_included_with_except_rule
+    assert_equal [:para, :parb, :complex, :number], GreedyUser.all_parameters.keys
+  end
+
+  def test_relations_included_with_except_rule
+    assert_equal [:posts], GreedyUser.all_relations.keys
   end
 
   def test_parameters_retrieved_correctly_for_single_relation
