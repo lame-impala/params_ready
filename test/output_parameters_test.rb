@@ -105,6 +105,25 @@ module ParamsReady
       assert_equal([0, 1, 2], d[:array].unwrap)
     end
 
+    def test_to_a_yields_array_of_decorated_objects
+      relation = get_relation
+      d = OutputParameters.decorate relation.freeze
+      ary = d[:array].to_a
+      ary.each do |elem|
+        assert elem.is_a? OutputParameters
+      end
+    end
+
+    def test_to_a_raises_if_called_on_non_array_parameter
+      relation = get_relation
+      d = OutputParameters.decorate relation.freeze
+      err = assert_raises(ParamsReadyError) do
+        d[:string].to_a
+      end
+      exp = "Unimplemented method 'to_a' for ParamsReady::Parameter::ValueParameterDefinition"
+      assert_equal exp, err.message
+    end
+
     def test_with_to_hash_parameter_is_self_permitted
       intent = Intent.instance(:frontend).permit(:string, :array, polymorph: [complex: [:first]])
       d = OutputParameters.decorate(get_relation.freeze, intent)

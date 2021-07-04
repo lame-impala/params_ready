@@ -72,6 +72,17 @@ module ParamsReady
       end
     end
 
+
+    def to_a
+      if @parameter.definition.is_a? Parameter::ArrayParameterDefinition
+        (0...@parameter.length).map do |n|
+          self[n]
+        end
+      else
+        raise ParamsReadyError, "Unimplemented method 'to_a' for #{@parameter.definition.class.name}"
+      end
+    end
+
     def flat_pairs(format = @intent.format, restriction: @intent.restriction, data: @intent.data)
       self.class.flatten_hash(for_output(format, restriction: restriction, data: data), scoped_name)
     end

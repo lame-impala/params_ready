@@ -74,7 +74,7 @@ module ParamsReady
       end
 
       def_delegators :@definition, :prototype
-      def_delegators :bare_value, :length, :each, :each_with_index, :map, :reduce, :to_a
+      def_delegators :bare_value, :length, :count, :each, :each_with_index, :map, :reduce, :to_a
 
       freeze_variable :value do |array|
         array.each(&:freeze)
