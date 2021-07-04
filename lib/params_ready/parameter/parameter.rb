@@ -454,18 +454,14 @@ module ParamsReady
         return unless @value == Extensions::Undefined
         return unless default_defined?
 
-        @value = if to_be_frozen
-          definition.default
-        else
-          definition.duplicate_default
-        end
+        @value = definition.fetch_default(duplicate: !to_be_frozen)
       end
 
       def init_for_write
         return if is_definite?
 
         if default_defined? && !default.nil?
-          @value = definition.duplicate_default
+          @value = definition.fetch_default
         else
           init_value
         end

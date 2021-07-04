@@ -221,10 +221,16 @@ module ParamsReady
         freeze_value(canonical)
       end
 
-      def duplicate_default
+      def fetch_default(duplicate: true)
         return Extensions::Undefined unless default_defined?
         return nil if @default.nil?
-        value = @default.is_a?(Helpers::Callable) ? @default.call : @default
+        value = if @default.is_a?(Helpers::Callable)
+          value = @default.call
+          ensure_canonical(value)
+        else
+          @default
+        end
+        return value unless duplicate
 
         duplicate_value(value)
       end
