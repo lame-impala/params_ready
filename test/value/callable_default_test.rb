@@ -79,5 +79,16 @@ module ParamsReady
       assert_equal Global.string.object_id, Global.string.object_id
       refute_equal Global.string.object_id, p.unwrap.object_id
     end
+
+    def test_freezes_value
+      d = Builder.define_parameter :string, :str do
+        default ParamsReady::Helpers::Callable.new { Global.string }
+      end
+      _, p = d.from_input(nil)
+      p.freeze
+      assert_equal Global.string, p.unwrap
+      assert p.unwrap.frozen?
+      refute Global.string.frozen?
+    end
   end
 end
