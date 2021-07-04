@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
     lib/params_ready/extensions/undefined.rb
 
     lib/params_ready/helpers/arel_builder.rb
+    lib/params_ready/helpers/callable.rb
     lib/params_ready/helpers/conditional_block.rb
     lib/params_ready/helpers/find_in_hash.rb
     lib/params_ready/helpers/interface_definer.rb

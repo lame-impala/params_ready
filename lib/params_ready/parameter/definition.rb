@@ -9,6 +9,7 @@ require_relative '../extensions/undefined'
 require_relative '../input_context'
 require_relative '../result'
 require_relative '../helpers/conditional_block'
+require_relative '../helpers/callable'
 
 module ParamsReady
   module Parameter
@@ -212,6 +213,7 @@ module ParamsReady
 
       late_init :default, once: false, definite: false do |value|
         next value if value == Extensions::Undefined
+        next value if value.is_a? Helpers::Callable
 
         canonical = canonical_default(value)
         next canonical if canonical.nil?
@@ -222,8 +224,9 @@ module ParamsReady
       def duplicate_default
         return Extensions::Undefined unless default_defined?
         return nil if @default.nil?
+        value = @default.is_a?(Helpers::Callable) ? @default.call : @default
 
-        duplicate_value(@default)
+        duplicate_value(value)
       end
 
 

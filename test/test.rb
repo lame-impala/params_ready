@@ -59,6 +59,7 @@ require_relative 'query/relation_test'
 require_relative 'query/variable_operator_predicate_test'
 
 require_relative 'value/boolean_test'
+require_relative 'value/callable_default_test'
 require_relative 'value/constraint_test'
 require_relative 'value/custom_test'
 require_relative 'value/date_test'
