@@ -165,7 +165,7 @@ module ParamsReady
       def ensure_canonical(value)
         coerced = coder.try_coerce value, Format.instance(:backend)
         if coder.strict_default? && value != coerced
-          raise ParamsReadyError, "input '#{value}' (#{value.class.name}) coerced to '#{coerced}' (#{coerced.class.name})"
+          raise ParamsReadyError, "input '#{value}'/#{value.class.name} (expected '#{coerced}'/#{coerced.class.name})"
         end
         validate coerced
         coerced

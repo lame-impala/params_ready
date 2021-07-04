@@ -155,7 +155,7 @@ module ParamsReady
             default 'FOO'
           end
         end
-        exp = "Invalid default: input 'FOO' (String) coerced to 'DummyObject(FOO)' (DummyObject)"
+        exp = "Invalid default: input 'FOO'/String (expected 'DummyObject(FOO)'/DummyObject)"
         assert_equal exp, err.message
       end
 

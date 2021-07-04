@@ -224,15 +224,20 @@ module ParamsReady
       def fetch_default(duplicate: true)
         return Extensions::Undefined unless default_defined?
         return nil if @default.nil?
-        value = if @default.is_a?(Helpers::Callable)
-          value = @default.call
-          ensure_canonical(value)
+        if @default.is_a?(Helpers::Callable)
+          fetch_callable_default
         else
-          @default
+          return @default unless duplicate
+          duplicate_value(@default)
         end
-        return value unless duplicate
+      end
 
+      def fetch_callable_default
+        value = @default.call
+        value = ensure_canonical(value)
         duplicate_value(value)
+      rescue StandardError => e
+        raise ParamsReadyError, "Invalid default: #{e.message}"
       end
 
 

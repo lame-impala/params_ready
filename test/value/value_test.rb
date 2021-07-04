@@ -113,7 +113,7 @@ module ParamsReady
             default ''
           end.create
         end
-        assert_equal "Invalid default: input '' (String) coerced to 'Default' (String)", err.message
+        assert_equal "Invalid default: input ''/String (expected 'Default'/String)", err.message
       end
     end
   end

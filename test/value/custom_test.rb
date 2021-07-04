@@ -65,7 +65,7 @@ module ParamsReady
             default 'UPCASE'
           end
         end
-        assert_equal "Invalid default: input 'UPCASE' (String) coerced to 'upcase' (String)", err.message
+        assert_equal "Invalid default: input 'UPCASE'/String (expected 'upcase'/String)", err.message
       end
 
       def test_casts_string_to_down_case

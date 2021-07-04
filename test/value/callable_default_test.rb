@@ -44,12 +44,12 @@ module ParamsReady
       err = assert_raises(ParamsReadyError) do
         p[:local].unwrap
       end
-      assert_equal "input '1' (String) coerced to '1' (Integer)", err.message
+      assert_equal "Invalid default: input '1'/String (expected '1'/Integer)", err.message
       Global.current = 2
       err = assert_raises(ParamsReadyError) do
         p[:default].unwrap
       end
-      assert_equal "input '2' (String) coerced to '2' (Integer)", err.message
+      assert_equal "Invalid default: input '2'/String (expected '2'/Integer)", err.message
     end
 
     def test_callable_default_is_legal

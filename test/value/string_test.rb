@@ -35,7 +35,7 @@ module ParamsReady
       exp = assert_raises do
         get_param default: :either
       end
-      assert_equal("Invalid default: input 'either' (Symbol) coerced to 'either' (String)", exp.message)
+      assert_equal("Invalid default: input 'either'/Symbol (expected 'either'/String)", exp.message)
     end
 
     def test_sets_with_correct_value_from_hash
