@@ -224,6 +224,7 @@ module ParamsReady
       def fetch_default(duplicate: true)
         return Extensions::Undefined unless default_defined?
         return nil if @default.nil?
+
         if @default.is_a?(Helpers::Callable)
           fetch_callable_default
         else
