@@ -20,6 +20,14 @@ module ParamsReady
     def self.not_canonical
       current.to_s
     end
+
+    def self.raising
+      raise 'BOO!'
+    end
+
+    def self.string
+      @string ||= 'foo'
+    end
   end
 
   class CallableDefaultTest < Minitest::Test
@@ -52,13 +60,24 @@ module ParamsReady
       assert_equal "Invalid default: input '2'/String (expected '2'/Integer)", err.message
     end
 
-    def test_callable_default_is_legal
-      d = get_def(proc { Global.previous }, proc { Global.current })
+    def test_raises_propietary_error_if_callable_fails
+      d = get_def(proc { Global.raising }, proc { Global.raising })
       Global.current = 1
       _, p = d.from_input standard: 7
-      Global.current = 2
-      assert_equal 1, p[:local].unwrap
-      assert_equal 2, p[:default].unwrap
+      err = assert_raises(ParamsReadyError) do
+        p[:local].unwrap
+      end
+      assert_equal "Invalid default: BOO!", err.message
+    end
+
+    def test_duplicates_default
+      d = Builder.define_parameter :string, :str do
+        default ParamsReady::Helpers::Callable.new { Global.string }
+      end
+      _, p = d.from_input(nil)
+      assert_equal Global.string, p.unwrap
+      assert_equal Global.string.object_id, Global.string.object_id
+      refute_equal Global.string.object_id, p.unwrap.object_id
     end
   end
 end
