@@ -5,7 +5,7 @@ module ParamsReady
     module ParameterUserClassMethods
       def params_ready_option
         @params_ready_option ||= begin
-          if superclass.respond_to? :params_ready_storage
+          if superclass.respond_to? :params_ready_option
             # This works on assumption that superclass
             # definition doesn't change during execution
             superclass.params_ready_option.dup
