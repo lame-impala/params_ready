@@ -28,7 +28,7 @@ end
 
 There are equivalent methods in the form `"define_#{type_name}"` provided for
 all parameter types that have been registered with the builder class, 
-so that any of the following is possible: `Builder.define_string`, `Builder.define_hash`, etc. 
+so that any of the following is possible: `Builder.define_string`, `Builder.define_struct`, etc. 
 
 Predefined builders generally accept `:name` as the first positional 
 argument and `:altn` (for  	‘alternative name’) as an optional keyword argument. 
@@ -166,8 +166,8 @@ initialize it from a hash and freeze it immediately. Then we update value
 of one of the nested parameters:
 
 ```ruby
-definition = Builder.define_hash :parameter do 
-  add :hash, :inner do 
+definition = Builder.define_struct :parameter do 
+  add :struct, :inner do 
     add :integer, :a 
     add :integer, :b
   end
@@ -254,7 +254,7 @@ module ParamsReady
   end
 end
 
-Builder.define_hash :hash do
+Builder.define_struct :struct do
   add :enum, :role_enum, enum_class: RoleEnum
 end
 ```
@@ -380,13 +380,13 @@ Note that `nil` is never subject to constraint, nullness is being checked by
 different mechanism.
 
 
-### Hash parameter
-Hash parameter type is provided to represent structured parameters. It can host
+### Struct parameter
+Struct parameter type is provided to represent structured parameters. It can host
 parameters of any type so hierarchical structures of arbitrary depth 
-can be defined. A hash parameter is defined like so:
+can be defined. A struct parameter is defined like so:
 
 ```ruby
-definition = Builder.define_hash :parameter do
+definition = Builder.define_struct :parameter do
   add :boolean, :checked do
     default true
   end
@@ -399,8 +399,8 @@ definition = Builder.define_hash :parameter do
 end
 ```
 
-Here we have a hash parameter composed from one boolean parameter with default,
-one optional string parameter and an integer parameter. The whole hash is also
+Here we have a struct parameter composed from one boolean parameter with default,
+one optional string parameter and an integer parameter. The whole struct is also
 optional. Builder names are used to define nested parameters, which is
 only possible for builders registered with the `Builder` class. Alternatively, 
 parameter definition may be passed into the `#add`  method. This is a possible 
@@ -414,7 +414,7 @@ search = Builder.define_string :search do
   optional 
 end
 
-parameter = Builder.define_hash(:action) do
+parameter = Builder.define_struct(:action) do
   add checked
   add search
 end.create
@@ -429,22 +429,22 @@ parameter[:search] = 'foo'
 assert_equal 'foo', parameter[:search].unwrap
 ```
 
-Hash parameter unwraps into a standard hash, with all nested parameters
+Struct parameter unwraps into a standard hash, with all nested parameters
 unwrapped to their bare values:
 
 ```ruby
 assert_equal({ checked: true, search: 'foo' }, parameter.unwrap)
 ```
 
-It’s generally desirable to have default defined for hash parameters, 
+It’s generally desirable to have default defined for struct parameters, 
 but it may be tedious to write it out for complex structures.
-There is a shortcut for hash parameters: just pass `:inferred` 
+There is a shortcut for struct parameters: just pass `:inferred` 
 to the `#default` method and the parameter will construct 
 the default for you. This will only succeed if all children either 
 are optional or have default defined:
 
 ```ruby
-parameter = Builder.define_hash :parameter do 
+parameter = Builder.define_struct :parameter do 
   add :integer, :int do 
     default 5
   end
@@ -550,14 +550,14 @@ _, parameter = definition.from_input [0, 1, 0, 2]
 assert_equal [1, 2], parameter.unwrap
 ```   
 
-### Hash set parameter
-There’s a modification of HashParameter that unwraps into a `Set`. 
+### Enum set parameter
+There’s a modification of StructParameter that unwraps into a `Set`. 
 It may be particularly useful for building SQL ‘IN’ predicates
 from data originating from checkboxes and similar form inputs. 
 It is defined like this:
 
 ```ruby
-definition = Builder.define_hash_set :set do 
+definition = Builder.define_enum_set :set do 
   add :pending
   add :processing
   add :complete
@@ -566,11 +566,11 @@ _, parameter = definition.from_input(pending: true, processing: true, complete: 
 assert_equal [:pending, :processing].to_set, parameter.unwrap
 ```
 
-This is the trivial case where values are identical to the hash keys. 
-`HashSetParameter` also allows to map each key to a specific value: 
+This is the trivial case where values are identical to the keys. 
+`EnumSetParameter` also allows to map each key to a specific value: 
 
 ```ruby
-definition = Builder.define_hash_set :set do 
+definition = Builder.define_enum_set :set do 
   add :pending, val: 0
   add :processing, val: 1
   add :complete, val: 2
@@ -582,8 +582,8 @@ assert_equal [0, 1].to_set, parameter.unwrap
 ### Polymorph parameter
 Polymorph parameter is a kind of a union type able to hold parameters of different 
 types and names. Types must not necessarily be primitives, arbitrarily complex
-hash or array parameters are allowed. A concept like this might not seem very practical 
-at first since it can be replaced with hash parameters in most contexts, 
+struct or array parameters are allowed. A concept like this might not seem very practical 
+at first since it can be replaced with struct parameters in most contexts, 
 but it provides means to define heterogeneous arrays of parameters, which in turn 
 are useful when composing dynamic SQL queries. 
 Definition of a polymorph parameter needs to declare all acceptable
@@ -648,7 +648,7 @@ service that uses different naming convention.
 Alternative name may be set in the builder constructor like so:
 
 ```ruby
-definition = Builder.define_hash :hash, altn: :h do 
+definition = Builder.define_struct :struct, altn: :h do 
  add :string, :name, altn: :n
 end
 ```
@@ -675,7 +675,7 @@ assert_equal({ name: 'BAR' }, parameter.unwrap)
 
 The `#unwrap` method uses standard naming scheme and there is no way to modify
 this behaviour. For full control over how output is created, use `#for_output` 
-method defined on `HashParameter`. It allows for format and restriction to be passed in
+method defined on `StructParameter`. It allows for format and restriction to be passed in
 to express particular intent. It also has the helpful property 
 that it never returns `nil` even in situations where `#unwrap` would; it returns
 empty hash instead. 
@@ -695,7 +695,7 @@ structure of the parameter object. Mapping works on output in reverse so an
 output hash formatted for frontend can be expected to match the original structure:
 
 ```ruby
-definition = Builder.define_hash :parameter do
+definition = Builder.define_struct :parameter do
   add :string, :remapped, altn: [:path, :to, :string]
 end
 
@@ -706,7 +706,7 @@ assert_equal 'FOO', parameter[:remapped].unwrap
 assert_equal input, parameter.to_hash(:frontend)
 ```
 
-For hash parameters there exists yet another method to remap input structure,
+For struct parameters there exists yet another method to remap input structure,
 independent of naming schemes. It transforms the input hash following 
 a predefined mapping into an entirely new hash that is passed to the next stage, and likewise
 it maps the output hash back to the original structure after it has been populated.
@@ -717,7 +717,7 @@ respectively. The last element of either one of the arrays is a list of keys
 to copy from the input to the result and vice versa.
 
 ```ruby
-definition = Builder.define_hash :parameter do
+definition = Builder.define_struct :parameter do
   add :string, :foo
   add :string, :bar
   add :integer, :first
@@ -740,7 +740,7 @@ assert_equal input, parameter.to_hash(:json)
 
 Both methods to define mapping presented here are equally powerful but they are different in two
 important aspects. When using the `#map` method, we need to define mapping for 
-all of the children of the hash parameter, even for those where no remapping actually
+all of the children of the struct parameter, even for those where no remapping actually
 happens, otherwise these children won’t receive no data at all. Also, of all formats 
 predefined in this library, the `#map` method only works with `:json`. On the
 other hand, the `#map` method seems to produce somewhat clearer code if the
@@ -755,10 +755,10 @@ but for different purpose – preventing secrets from leaking to the frontend.
 The behaviour of no-output parameters is controlled 
 by different flag on the format object. 
 We can see minification in action when we invoke `#for_output` with `:frontend` 
-formatting on a hash parameter containing default, optional and no-output children:
+formatting on a struct parameter containing default, optional and no-output children:
 
 ```ruby
-definition = Builder.define_hash :parameter do
+definition = Builder.define_struct :parameter do
   add :string, :default_parameter do
     default 'FOO'
   end
@@ -860,13 +860,13 @@ prohibiting the children parameters, possibly going on to arbitrary depth.
 Let’s see an illustration of this in code:
 
 ```ruby
-definition = Builder.define_hash :parameter do
+definition = Builder.define_struct :parameter do
   add :string, :allowed
   add :integer, :disallowed
-  add :hash, :allowed_as_a_whole do
+  add :struct, :allowed_as_a_whole do
     add :integer, :allowed_by_inclusion
   end
-  add :hash, :partially_allowed do
+  add :struct, :partially_allowed do
     add :integer, :allowed
     add :integer, :disallowed
   end
@@ -887,7 +887,7 @@ input = {
 _, parameter = definition.from_input(input)
 ```
 
-We have defined a hash parameter containing one simple and two complex 
+We have defined a struct parameter containing one simple and two complex 
 parameters as children. We’ll show both permission and prohibition approaches 
 to achieve the same goal:
 
@@ -947,10 +947,10 @@ model presumably has all attributes already set to correct values. To prevent cu
 attribute values to be overwritten on update, we can mark default having parameters as optional 
 so that they are considered undefined if the value is missing from the input. 
 
-Consider this hash parameter holding attributes for a model:
+Consider this struct parameter holding attributes for a model:
 
-```ruby 
-definition = Builder.define_hash :model do
+```ruby
+definition = Builder.define_struct :model do
   add :string, :name
   add :integer, :role do
     default 2
@@ -987,7 +987,7 @@ Also, instead of providing default, we mark it here as optional to prevent attri
 to be overwritten to `nil` if user id is missing:
 
 ```ruby
-Builder.define_hash :model do
+Builder.define_struct :model do
   add :string, :name
   add :integer, :owner_id do
     local; optional
@@ -1021,7 +1021,7 @@ allowing strings delimited by either a comma or a semicolon and we want to trans
 that into an array, while omitting empty strings: 
 
 ```ruby
-definition = Builder.define_hash :model do
+definition = Builder.define_struct :model do
   add :array, :to do
     prototype :string
 
@@ -1041,7 +1041,7 @@ In the last example we use a `#postprocess` block to alter the value of a parame
 after it has been constructed:
 
 ```ruby
-definition = Builder.define_hash :model do
+definition = Builder.define_struct :model do
   add :integer, :lower
   add :integer, :higher
 
@@ -1073,13 +1073,13 @@ posts index should maintain options (search and pagination) for both users index
 posts index. A bare-bones definition could look like this:
 
 ```ruby
-definition = Builder.define_hash :parameter do
-  add :hash, :users do
+definition = Builder.define_struct :parameter do
+  add :struct, :users do
     add(:string, :name_match){ optional }
     add(:integer, :offset){ default 0 }
   end
 
-  add :hash, :posts do
+  add :struct, :posts do
     add(:integer, :user_id){ optional }
     add(:string, :subject_match){ optional }
     add(:integer, :offset){ default 0 }
@@ -1138,7 +1138,7 @@ parameter object. There is a decorator class called `OutputParameters` to
 provide those values:
 
 ```ruby
-definition = Builder.define_hash :complex, altn: :cpx do
+definition = Builder.define_struct :complex, altn: :cpx do
   add :string, :string_parameter, altn: :sp
   add :array, :array_parameter, altn: :ap do
     prototype :integer
@@ -1248,7 +1248,7 @@ definition = Builder.define_relation :users do
     optional
   end
   custom_predicate :active_custom_predicate do                        #6
-    type :hash do
+    type :struct do
       add(:integer, :days_ago) { default 1 }
       add(:boolean, :checked) { optional }
       default :inferred
@@ -1484,7 +1484,7 @@ assert_equal exp, p.to_query(User.arel_table, context: context).to_sql.unquote
 ```
 
 Among operators allowed for the fixed operator predicate, `:in` and `:not_in` are special in that 
-the type must be a collection (either `:array` or `:hash_set`). In all other aspects they work 
+the type must be a collection (either `:array` or `:enum_set`). In all other aspects they work 
 pretty much the same as the rest:
 
 ```ruby
@@ -1609,7 +1609,7 @@ to filter results. We could use definition such as this:
 
 ```ruby
 definition = Query::CustomPredicateBuilder.instance(:search_by_name).include do
-  type :hash do
+  type :struct do
     add :string, :search
     add :symbol, :operator do
       constrain :enum, %i(equal like)
@@ -1993,7 +1993,7 @@ directly in the controller:
 
 ```ruby
 class UsersController < ApplicationController
-  define_parameter :hash, :user do
+  define_parameter :struct, :user do
     no_output
     add :string, :email do
       optional
@@ -2205,7 +2205,7 @@ be able to get back to pages they’ve seen.
 It is possible to extend parameters but it is not a straightforward job. In most cases
 it amounts to subclassing as many as three classes: one for builder, definition and
 the parameter itself. If you are interested you may have a look at the implementation
-of `StructuredGrouping` and `OrderingParameter`, subclasses of `HashParameter` and 
+of `StructuredGrouping` and `OrderingParameter`, subclasses of `StructParameter` and 
 `ArrayParameter` respectively, to see how this is done.
 An easier way to add functionality to a parameter is to call `#helper` method 
 within the parameter definition. This will add a new public method to each instance created
@@ -2245,10 +2245,10 @@ assert_equal 'a; b; c', p.format(Format.instance(:frontend))
 ```
 
 Another alternative ready-to-use marshaller is the base64 marshaller
-for hash parameter:
+for struct parameter:
 
 ```ruby
-definition = Builder.define_hash :parameter do
+definition = Builder.define_struct :parameter do
   add :integer, :int
   add :string, :str
   marshal using: :base64
