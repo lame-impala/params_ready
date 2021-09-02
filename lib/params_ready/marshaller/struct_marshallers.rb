@@ -4,7 +4,7 @@ require_relative 'collection'
 
 module ParamsReady
   module Marshaller
-    class HashMarshallers
+    class StructMarshallers
       module AbstractMarshaller
         def extract_bare_value(parameter, intent)
           parameter.names.keys.reduce({}) do |result, name|
@@ -27,11 +27,11 @@ module ParamsReady
         def self.canonicalize(definition, string, context, validator)
           json = Base64.urlsafe_decode64(string)
           hash = JSON.parse(json)
-          HashMarshaller.canonicalize(definition, hash, context, validator)
+          StructMarshaller.canonicalize(definition, hash, context, validator)
         end
 
         def self.marshal(parameter, intent)
-          hash = HashMarshaller.marshal(parameter, intent)
+          hash = StructMarshaller.marshal(parameter, intent)
           json = JSON.generate(hash)
           Base64.urlsafe_encode64(json)
         end
@@ -39,7 +39,7 @@ module ParamsReady
         freeze
       end
 
-      module HashMarshaller
+      module StructMarshaller
         extend AbstractMarshaller
 
         def self.canonicalize(definition, hash, context, validator, freeze: false)
@@ -88,7 +88,7 @@ module ParamsReady
       def self.collection
         @collection ||= begin
           c = ClassCollection.new Hash
-          c.add_instance Hash, HashMarshaller
+          c.add_instance Hash, StructMarshaller
           c.add_factory :base64, Base64Marshaller
           c.default!(Hash)
           c.freeze

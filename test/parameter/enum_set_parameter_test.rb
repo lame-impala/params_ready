@@ -1,5 +1,5 @@
 require_relative '../test_helper'
-require_relative '../../lib/params_ready/parameter/hash_set_parameter'
+require_relative '../../lib/params_ready/parameter/enum_set_parameter'
 require_relative '../../lib/params_ready/value/custom'
 require_relative '../../lib/params_ready/input_context'
 require_relative '../../lib/params_ready/output_parameters'
@@ -7,7 +7,7 @@ require_relative '../../lib/params_ready/result'
 
 module ParamsReady
   module Parameter
-    module HashSetParameterTestHelper
+    module EnumSetParameterTestHelper
       def get_conversion_param_definition
         Builder.define_hash_set(:conversion) do
           add(:pending, val: 0) { optional }
@@ -53,8 +53,8 @@ module ParamsReady
       end
     end
 
-    class HashSetConversionTest < Minitest::Test
-      include HashSetParameterTestHelper
+    class EnumSetConversionTest < Minitest::Test
+      include EnumSetParameterTestHelper
 
       def test_member_can_not_be_added_after_default_has_been_set
         err = assert_raises do
@@ -98,8 +98,8 @@ module ParamsReady
       end
     end
 
-    class HashSetParameterTest < Minitest::Test
-      include HashSetParameterTestHelper
+    class EnumSetParameterTest < Minitest::Test
+      include EnumSetParameterTestHelper
 
       def test_uninitialized_hash_set_parameter_raises_when_child_queried
         p = get_param
@@ -179,8 +179,8 @@ module ParamsReady
       end
     end
 
-    class HashSetWithSubtypeCoder < Minitest::Test
-      include HashSetParameterTestHelper
+    class EnumSetWithSubtypeCoder < Minitest::Test
+      include EnumSetParameterTestHelper
 
       def test_hashset_can_be_set_to_use_subtype_coder
         p = get_param type: :checkbox_boolean
@@ -202,8 +202,8 @@ module ParamsReady
       end
     end
 
-    class HashSetDefaultBehaviour < Minitest::Test
-      include HashSetParameterTestHelper
+    class EnumSetDefaultBehaviour < Minitest::Test
+      include EnumSetParameterTestHelper
 
       def test_default_hash_set_param_writes_placeholder_if_values_eq_defaults_and_not_overall_default_and_formatting_is_frontend
         p = get_param defaults: { pending: true, processing: true, complete: false }, default: %i[pending].to_set
@@ -230,8 +230,8 @@ module ParamsReady
       end
     end
 
-    class HashSetRestrictionBehaviour < Minitest::Test
-      include HashSetParameterTestHelper
+    class EnumSetRestrictionBehaviour < Minitest::Test
+      include EnumSetParameterTestHelper
 
       def test_only_allowed_values_appear_in_the_set
         p = get_param
@@ -256,8 +256,8 @@ module ParamsReady
       end
     end
 
-    class HashSetOptionalBehaviour < Minitest::Test
-      include HashSetParameterTestHelper
+    class EnumSetOptionalBehaviour < Minitest::Test
+      include EnumSetParameterTestHelper
 
       def test_uninitialized_optional_hash_set_writes_hash_with_nil_value_with_backend_intent
         p = get_param optional: true

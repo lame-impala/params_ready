@@ -1,5 +1,5 @@
 require_relative 'predicate'
-require_relative '../parameter/hash_parameter'
+require_relative '../parameter/struct_parameter'
 require_relative '../parameter/value_parameter'
 require_relative '../value/validator'
 require_relative 'predicate_operator'
@@ -12,7 +12,7 @@ module ParamsReady
 
       def initialize(definition)
         super definition
-        @data = definition.hash_parameter.create
+        @data = definition.struct_parameter.create
       end
 
       def build_query(select_expression, context: nil)
@@ -64,7 +64,7 @@ module ParamsReady
       PredicateRegistry.register_predicate :variable_operator_predicate, self
       include HavingType
       include HavingAttribute
-      include DelegatingBuilder[:hash_parameter_builder]
+      include DelegatingBuilder[:struct_parameter_builder]
 
       def self.instance(name, altn: nil, attr: nil)
         new VariableOperatorPredicateDefinition.new name, altn: altn, attribute_name: attr
@@ -82,19 +82,19 @@ module ParamsReady
     class VariableOperatorPredicateDefinition < AbstractPredicateDefinition
       include HavingAttribute
 
-      attr_reader :hash_parameter_builder
-      attr_reader :hash_parameter
+      attr_reader :struct_parameter_builder
+      attr_reader :struct_parameter
 
       def initialize(*args, attribute_name: nil, **opts)
         super *args, **opts
         @attribute_name = attribute_name
-        @hash_parameter_builder = Builder.builder(:hash).instance(name, altn: altn)
+        @struct_parameter_builder = Builder.builder(:struct).instance(name, altn: altn)
         @operator_parameter_builder = Builder.builder(:predicate_operator).instance(:operator, altn: :op)
       end
 
       def set_type(type)
         @type = type
-        @hash_parameter_builder.add @type.finish
+        @struct_parameter_builder.add @type.finish
       end
 
       def set_operators(array, &block)
@@ -107,12 +107,12 @@ module ParamsReady
           constrain :enum, operators
         end
         @operator_parameter_builder.include(&block) unless block.nil?
-        @hash_parameter_builder.add @operator_parameter_builder.build
+        @struct_parameter_builder.add @operator_parameter_builder.build
       end
 
       def finish
-        @hash_parameter = @hash_parameter_builder.build
-        @hash_parameter_builder = nil
+        @struct_parameter = @struct_parameter_builder.build
+        @struct_parameter_builder = nil
         @operator_parameter_builder = nil
         @type = nil
 

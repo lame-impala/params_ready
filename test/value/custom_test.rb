@@ -1,7 +1,7 @@
 require_relative '../../lib/params_ready/value/custom'
 require_relative '../test_helper'
 require_relative '../../lib/params_ready/input_context'
-require_relative '../../lib/params_ready/parameter/hash_parameter'
+require_relative '../../lib/params_ready/parameter/struct_parameter'
 
 module ParamsReady
   module Value

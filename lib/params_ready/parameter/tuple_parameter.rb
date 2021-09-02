@@ -98,7 +98,7 @@ module ParamsReady
         end
       end
 
-      class HashMarshaller
+      class StructMarshaller
         def marshal(fields, _format)
           fields.each_with_index.map do |field, index|
             [index.to_s, field]

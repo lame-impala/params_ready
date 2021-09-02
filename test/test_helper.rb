@@ -8,7 +8,7 @@ require 'active_record'
 require 'ruby2_keywords'
 require_relative '../lib/params_ready/intent'
 require_relative '../lib/params_ready/parameter/value_parameter'
-require_relative '../lib/params_ready/parameter/hash_parameter'
+require_relative '../lib/params_ready/parameter/struct_parameter'
 require_relative '../lib/params_ready/parameter/tuple_parameter'
 require_relative '../lib/params_ready/parameter/polymorph_parameter'
 

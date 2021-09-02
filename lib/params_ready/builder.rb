@@ -28,6 +28,23 @@ module ParamsReady
       register_builder(name, self)
     end
 
+    def self.register_deprecated(name, use:)
+      raise ParamsReadyError, 'Recommended replacement must not be nil' if use.nil?
+      @deprecated ||= {}
+      @deprecated[name] = use.to_s.freeze
+      register_builder(name, self)
+    end
+
+    class << self
+      alias_method :fetch_builder, :builder
+    end
+
+    def self.builder(name)
+      use = @deprecated[name] if @deprecated&.key? name
+      warn "Builder name deprecated: #{name}, use: #{use}" unless use.nil?
+      fetch_builder(name)
+    end
+
     def self.define_parameter(type, *args, **opts, &block)
       builder_class = builder(type)
       builder = builder_class.instance(*args, **opts)

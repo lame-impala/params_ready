@@ -1,6 +1,6 @@
 require_relative 'parameter'
 require_relative 'definition'
-require_relative 'abstract_hash_parameter'
+require_relative 'abstract_struct_parameter'
 require_relative '../builder'
 require_relative '../marshaller/array_marshallers'
 require_relative '../marshaller/builder_module'

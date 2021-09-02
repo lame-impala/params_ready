@@ -58,7 +58,7 @@ module ParamsReady
       PredicateRegistry.register_predicate :exists_predicate, self
 
       include GroupingLike
-      include Parameter::AbstractHashParameterBuilder::HashLike
+      include Parameter::AbstractStructParameterBuilder::StructLike
       include HavingArelTable
 
       def self.instance(name, altn: nil, coll: nil)

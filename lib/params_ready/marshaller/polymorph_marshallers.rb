@@ -3,7 +3,7 @@ require_relative 'collection'
 module ParamsReady
   module Marshaller
     class PolymorphMarshallers
-      class HashMarshaller
+      class StructMarshaller
         attr_reader :type_identifier
 
         def self.instance(type_identifier:)
@@ -57,7 +57,7 @@ module ParamsReady
       def self.collection
         @collection ||= begin
           c = ClassCollection.new Hash
-          c.add_factory :hash, HashMarshaller
+          c.add_factory :hash, StructMarshaller
           c.freeze
           c
         end

@@ -3,7 +3,7 @@ require_relative '../../lib/params_ready'
 
 module ParamsReady
   module Examples
-    class HashExamples < Minitest::Test
+    class StructExamples < Minitest::Test
       def test_example_hash_definition_using_convenience_methods_is_legal
         definition = Builder.define_hash :parameter do
           add(:boolean, :checked) do

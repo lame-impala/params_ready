@@ -1,13 +1,13 @@
 require 'set'
-require_relative 'hash_parameter'
+require_relative 'struct_parameter'
 require_relative 'value_parameter'
 require_relative '../intent'
-require_relative '../marshaller/hash_set_marshallers'
+require_relative '../marshaller/enum_set_marshallers'
 require_relative '../marshaller/parameter_module'
 
 module ParamsReady
   module Parameter
-    class HashSetParameter < AbstractHashParameter
+    class EnumSetParameter < AbstractStructParameter
       include Marshaller::ParameterModule
 
       def self.intent_for_set(intent)
@@ -31,13 +31,14 @@ module ParamsReady
       end
     end
 
-    class HashSetParameterBuilder < Builder
+    class EnumSetParameterBuilder < Builder
       include Marshaller::BuilderModule
 
-      register :hash_set
+      register :enum_set
+      register_deprecated :hash_set, use: :enum_set
 
       def self.instance(name, altn: nil, type: :boolean)
-        new HashSetParameterDefinition.new(name, altn: altn, type: type)
+        new EnumSetParameterDefinition.new(name, altn: altn, type: type)
       end
 
       def add(input, *args, val: nil, **opts, &block)
@@ -56,12 +57,12 @@ module ParamsReady
       end
     end
 
-    class HashSetParameterDefinition < AbstractHashParameterDefinition
+    class EnumSetParameterDefinition < AbstractStructParameterDefinition
       attr_reader :type, :values
       freeze_variable :values
-      name_for_formatter :hash_set
-      parameter_class HashSetParameter
-      include Marshaller::DefinitionModule[Marshaller::HashSetMarshallers.collection]
+      name_for_formatter :enum_set
+      parameter_class EnumSetParameter
+      include Marshaller::DefinitionModule[Marshaller::EnumSetMarshallers.collection]
 
       def initialize(*args, type: :boolean, **opts)
         @type = type

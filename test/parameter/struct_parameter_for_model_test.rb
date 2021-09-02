@@ -1,5 +1,5 @@
 require_relative '../test_helper'
-require_relative '../../lib/params_ready/parameter/hash_parameter'
+require_relative '../../lib/params_ready/parameter/struct_parameter'
 require_relative '../../lib/params_ready/input_context'
 
 module ParamsReady
@@ -68,7 +68,7 @@ module ParamsReady
       end
     end
 
-    class HashParameterForModelTest < Minitest::Test
+    class StructParameterForModelTest < Minitest::Test
       def get_def
         Builder.define_hash :model do
           add :string, :name

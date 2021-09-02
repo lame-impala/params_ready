@@ -1,6 +1,6 @@
 require_relative '../extensions/registry'
 require_relative '../parameter/array_parameter'
-require_relative '../parameter/hash_set_parameter'
+require_relative '../parameter/enum_set_parameter'
 require_relative '../helpers/arel_builder'
 
 module ParamsReady
@@ -45,7 +45,7 @@ module ParamsReady
       registry :types, as: :type, getter: true
       register_type :value, Parameter::ValueParameterBuilder
       register_type :array, Parameter::ArrayParameterBuilder
-      register_type :hash_set, Parameter::HashSetParameterBuilder
+      register_type :enum_set, Parameter::EnumSetParameterBuilder
     end
 
     class AbstractPredicateDefinition < Parameter::AbstractDefinition

@@ -1,9 +1,9 @@
 require_relative 'collection'
-require_relative 'hash_marshallers'
+require_relative 'struct_marshallers'
 
 module ParamsReady
   module Marshaller
-    class HashSetMarshallers
+    class EnumSetMarshallers
       module AbstractMarshaller
         def canonicalize_collection(definition, context, validator, freeze: false)
           hash = {}
@@ -18,7 +18,7 @@ module ParamsReady
         end
       end
 
-      module HashMarshaller
+      module StructMarshaller
         extend AbstractMarshaller
 
         def self.canonicalize(definition, hash, context, validator)
@@ -30,7 +30,7 @@ module ParamsReady
 
         def self.marshal(parameter, intent)
           if intent.marshal? parameter.name_for_formatter
-            HashMarshallers::HashMarshaller.marshal(parameter, intent)
+            StructMarshallers::StructMarshaller.marshal(parameter, intent)
           else
             SetMarshaller.marshal(parameter, intent)
           end
@@ -83,7 +83,7 @@ module ParamsReady
       def self.collection
         @collection ||= begin
           c = ClassCollection.new Hash
-          c.add_instance Hash, HashMarshaller
+          c.add_instance Hash, StructMarshaller
           c.add_instance Set, SetMarshaller
           c.add_instance Array, ArrayMarshaller
           c.default!(Hash)

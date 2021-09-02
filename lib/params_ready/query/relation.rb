@@ -257,7 +257,7 @@ module ParamsReady
 
     class RelationParameterBuilder < Builder
       include GroupingLike
-      include Parameter::AbstractHashParameterBuilder::HashLike
+      include Parameter::AbstractStructParameterBuilder::StructLike
       include HavingModel
 
       def self.instance(name, altn: nil)

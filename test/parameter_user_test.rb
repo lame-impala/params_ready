@@ -71,7 +71,7 @@ class ParameterUserTest < Minitest::Test
 
   def assert_param_frozen(prm)
     assert prm.frozen?, "Not frozen: #{prm.name}"
-    return unless prm.is_a? ParamsReady::Parameter::AbstractHashParameter
+    return unless prm.is_a? ParamsReady::Parameter::AbstractStructParameter
 
     prm.names.keys.each do |name|
       child = prm[name]
@@ -81,7 +81,7 @@ class ParameterUserTest < Minitest::Test
 
   def refute_param_frozen(prm)
     refute prm.frozen?, "Frozen: #{prm.name}"
-    return unless prm.is_a? ParamsReady::Parameter::AbstractHashParameter
+    return unless prm.is_a? ParamsReady::Parameter::AbstractStructParameter
 
     prm.names.keys.each do |name|
       child = prm[name]

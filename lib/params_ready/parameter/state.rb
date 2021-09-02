@@ -1,10 +1,10 @@
 require_relative '../error'
-require_relative '../../params_ready/parameter/hash_parameter'
+require_relative '../../params_ready/parameter/struct_parameter'
 require_relative '../query/relation'
 
 module ParamsReady
   module Parameter
-    class State < HashParameter
+    class State < StructParameter
       extend Query::Relation::PageAccessors
       extend Forwardable
       def_delegators :definition, :relations
@@ -98,7 +98,7 @@ module ParamsReady
       end
     end
 
-    class StateBuilder < HashParameterBuilder
+    class StateBuilder < StructParameterBuilder
       def relation(relation)
         @definition.add_relation relation
       end
@@ -109,7 +109,7 @@ module ParamsReady
       end
     end
 
-    class StateDefinition < HashParameterDefinition
+    class StateDefinition < StructParameterDefinition
       parameter_class State
       attr_reader :relations
 

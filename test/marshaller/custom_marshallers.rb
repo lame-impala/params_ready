@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require_relative '../../lib/params_ready/parameter/array_parameter'
 require_relative '../../lib/params_ready/parameter/tuple_parameter'
-require_relative '../../lib/params_ready/parameter/hash_set_parameter'
+require_relative '../../lib/params_ready/parameter/enum_set_parameter'
 require_relative '../../lib/params_ready/format'
 require_relative '../../lib/params_ready/query/polymorph_predicate'
 require_relative '../../lib/params_ready/query/fixed_operator_predicate'
@@ -57,7 +57,7 @@ module ParamsReady
             object[0][name] = (object[1] & value) > 0
             object[1] *=2
           end
-          Marshaller::HashSetMarshallers::HashMarshaller.canonicalize(definition, hash, format, validator)
+          Marshaller::EnumSetMarshallers::StructMarshaller.canonicalize(definition, hash, format, validator)
         end
 
         def self.marshal(parameter, intent)
@@ -93,7 +93,7 @@ module ParamsReady
         assert_equal input, p.format(Format.instance(:frontend))
       end
 
-      class HashToArray
+      class StructToArray
         def initialize(identifier)
           @identifier = identifier.freeze
         end
@@ -105,11 +105,11 @@ module ParamsReady
             name = hash.dup.delete(@identifier)
             [name, hash]
           end.to_h
-          Marshaller::HashMarshallers::HashMarshaller.canonicalize(definition, hash, format, validator)
+          Marshaller::StructMarshallers::StructMarshaller.canonicalize(definition, hash, format, validator)
         end
 
         def marshal(parameter, intent)
-          hash = Marshaller::HashMarshallers::HashMarshaller.marshal(parameter, intent)
+          hash = Marshaller::StructMarshallers::StructMarshaller.marshal(parameter, intent)
           hash.map do |key, value|
             value[@identifier] = key.to_s
             value
@@ -121,7 +121,7 @@ module ParamsReady
         d = Builder.define_hash :key_info do
           add :string, :key, altn: [:pk, :value]
           add :integer, :kid, altn: [:kid, :value]
-          marshal to: Array, using: HashToArray.new('item').freeze
+          marshal to: Array, using: StructToArray.new('item').freeze
         end
 
         input = [{ 'item' => 'pk', value: 'abcd' }, { 'item' => 'kid', value: '23405' }]
@@ -137,7 +137,7 @@ module ParamsReady
           add :integer, :kid
           map [:pk, [:value]] => [[:key]]
           map [:kid, [:value]] => [[:kid]]
-          marshal to: Array, using: HashToArray.new('item').freeze
+          marshal to: Array, using: StructToArray.new('item').freeze
         end
 
         input = [{ 'item' => 'pk', value: 'abcd' }, { 'item' => 'kid', value: 23405 }]
@@ -152,7 +152,7 @@ module ParamsReady
         ID_RE = /^\d+$/
         ACC_RE = /^\d\d[A-Z]{2}\d{8}$/
 
-        HASH_MARSHALLER = PolymorphMarshallers::HashMarshaller.new :ppt
+        HASH_MARSHALLER = PolymorphMarshallers::StructMarshaller.new :ppt
 
         def self.canonicalize(definition, string, context, validator)
           type, value = case string

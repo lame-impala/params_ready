@@ -1,7 +1,7 @@
 require_relative 'test_helper'
 require_relative '../lib/params_ready/intent'
 require_relative '../lib/params_ready/parameter/value_parameter'
-require_relative '../lib/params_ready/parameter/hash_parameter'
+require_relative '../lib/params_ready/parameter/struct_parameter'
 
 module ParamsReady
   class IntentTest < Minitest::Test
@@ -15,24 +15,24 @@ module ParamsReady
 
     def test_nested_parameters_unpermitted_if_empty_array_passed_in_as_list
       intent = Intent.instance(:backend)
-      permitted = intent.permit(hash: [])
-      param = Builder.define_hash :hash do
+      permitted = intent.permit(struct: [])
+      param = Builder.define_struct :struct do
         add :string, :first
         add :string, :second
       end
 
       nested = permitted.for_children(param)
-       refute(nested.name_permitted?(:first))
+      refute(nested.name_permitted?(:first))
     end
 
     def test_allowlist_is_constructed_if_names_are_passed_in
       intent = Intent.instance(:backend)
-      permitted = intent.permit(:first_scalar, :second_scalar, first_hash: [:first, second: [:a, :b]], second_hash: [:a, :b])
+      permitted = intent.permit(:first_scalar, :second_scalar, first_struct: [:first, second: [:a, :b]], second_struct: [:a, :b])
       exp = {
         first_scalar: Restriction::Everything,
         second_scalar: Restriction::Everything,
-        first_hash: [:first, second: [:a, :b]],
-        second_hash: [:a, :b]
+        first_struct: [:first, second: [:a, :b]],
+        second_struct: [:a, :b]
       }
       assert_equal(exp, permitted.restriction.restriction)
     end
@@ -40,12 +40,12 @@ module ParamsReady
     def test_denylist_is_constructed_if_names_are_passed_in
       intent = Intent.instance(:backend)
 
-      prohibited = intent.prohibit(:first_scalar, :second_scalar, first_hash: [:first, second: [:a, :b]], second_hash: [:a, :b])
+      prohibited = intent.prohibit(:first_scalar, :second_scalar, first_struct: [:first, second: [:a, :b]], second_struct: [:a, :b])
       exp = {
         first_scalar: Restriction::Everything,
         second_scalar: Restriction::Everything,
-        first_hash: [:first, second: [:a, :b]],
-        second_hash: [:a, :b]
+        first_struct: [:first, second: [:a, :b]],
+        second_struct: [:a, :b]
       }
       assert_equal(exp, prohibited.restriction.restriction)
     end
@@ -85,11 +85,9 @@ module ParamsReady
       intent = Intent.instance(:backend)
       permitted = intent.permit(:first, array: [:a, :b])
       parent = DummyParam.new(:array, :arr)
-      child =  DummyParam.new(:hash, :hsh)
+      child =  DummyParam.new(:struct, :sct)
       delegated = permitted.delegate(parent, child.name)
-      exp = {
-        hash: [:a, :b]
-      }
+      exp = { struct: [:a, :b] }
       assert_equal(exp, delegated.restriction.restriction)
     end
 

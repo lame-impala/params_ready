@@ -1,4 +1,4 @@
-require_relative '../parameter/hash_parameter'
+require_relative '../parameter/struct_parameter'
 require_relative '../parameter/value_parameter'
 require_relative 'fixed_operator_predicate'
 require_relative 'nullness_predicate'
@@ -6,7 +6,7 @@ require_relative 'grouping'
 
 module ParamsReady
   module Query
-    class StructuredGrouping < Parameter::HashParameter
+    class StructuredGrouping < Parameter::StructParameter
       include Parameter::GroupingLike
       def predicates
         return [] if is_nil?
@@ -29,7 +29,7 @@ module ParamsReady
 
     class StructuredGroupingBuilder < Builder
       include GroupingLike
-      include Parameter::AbstractHashParameterBuilder::HashLike
+      include Parameter::AbstractStructParameterBuilder::StructLike
       PredicateRegistry.register_predicate :structured_grouping_predicate, self
 
       def self.instance(name, altn: nil)
@@ -37,7 +37,7 @@ module ParamsReady
       end
     end
 
-    class StructuredGroupingDefinition < Parameter::HashParameterDefinition
+    class StructuredGroupingDefinition < Parameter::StructParameterDefinition
       attr_reader :arel_table, :predicates
 
       def initialize(*args, **opts)

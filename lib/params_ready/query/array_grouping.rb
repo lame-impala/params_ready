@@ -1,11 +1,11 @@
-require_relative '../parameter/hash_parameter'
+require_relative '../parameter/struct_parameter'
 require_relative '../parameter/array_parameter'
 require_relative 'grouping'
 require_relative 'predicate'
 
 module ParamsReady
   module Query
-    class ArrayGrouping < Parameter::HashParameter
+    class ArrayGrouping < Parameter::StructParameter
       include Parameter::GroupingLike
 
       def predicates
@@ -29,7 +29,7 @@ module ParamsReady
     end
 
     class ArrayGroupingBuilder < Builder
-      include Parameter::AbstractHashParameterBuilder::HashLike
+      include Parameter::AbstractStructParameterBuilder::StructLike
       PredicateRegistry.register_predicate :array_grouping_predicate, self
 
       def prototype(type_name, name = :proto, *arr, **opts, &block)
@@ -48,7 +48,7 @@ module ParamsReady
       end
     end
 
-    class ArrayGroupingDefinition < Parameter::HashParameterDefinition
+    class ArrayGroupingDefinition < Parameter::StructParameterDefinition
       def initialize(*args, **opts)
         super
       end

@@ -68,8 +68,8 @@ module ParamsReady
         assert_equal 'Factory', c.value_class_name
       end
 
-      def test_works_as_a_child_in_hash_parameter
-        d = Builder.define_hash :hash do
+      def test_works_as_a_child_in_struct_parameter
+        d = Builder.define_struct :struct do
           add :instantiable, :instantiable, value_class: DummyObject
         end
         _, p = d.from_input({ instantiable: 'FOO' })

@@ -3,9 +3,9 @@ require_relative '../../lib/params_ready'
 
 module ParamsReady
   module Examples
-    class HashSetExamples < Minitest::Test
+    class EnumSetExamples < Minitest::Test
       def test_basic_hash_set_example_works
-        definition = Builder.define_hash_set :set do
+        definition = Builder.define_enum_set :set do
           add :pending
           add :processing
           add :complete
@@ -15,7 +15,7 @@ module ParamsReady
       end
 
       def test_hash_set_with_value_mapping_works
-        definition = Builder.define_hash_set :set do
+        definition = Builder.define_enum_set :set do
           add :pending, val: 0
           add :processing, val: 1
           add :complete, val: 2

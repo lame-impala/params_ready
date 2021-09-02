@@ -67,7 +67,7 @@ module ParamsReady
         p = get_param(d)
 
         exp = <<~INSP
-          HashParameter inspect: { 
+          StructParameter inspect: { 
            {:integer=>ValueParameter integer: { 10 }, 
             :string=>ValueParameter string: { \"foo\" }, 
             :symbol=>ValueParameter symbol: { :sym }, 
@@ -83,7 +83,7 @@ module ParamsReady
         p = get_param(d)
 
         exp = <<~INSP
-          HashParameter inspect: { 
+          StructParameter inspect: { 
            {:integer=>ValueParameter integer: { [FILTERED] }, 
             :string=>ValueParameter string: { [FILTERED] }, 
             :symbol=>ValueParameter symbol: { :sym }, 

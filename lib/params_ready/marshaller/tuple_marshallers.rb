@@ -43,7 +43,7 @@ module ParamsReady
         freeze
       end
 
-      module HashMarshaller
+      module StructMarshaller
         extend AbstractMarshaller
 
         def self.canonicalize(definition, hash, context, validator)
@@ -92,7 +92,7 @@ module ParamsReady
         @collection ||= begin
           c = ClassCollection.new Array
           c.add_instance Array, ArrayMarshaller
-          c.add_instance Hash, HashMarshaller
+          c.add_instance Hash, StructMarshaller
           c.add_factory :string, StringMarshaller
           c.freeze
           c

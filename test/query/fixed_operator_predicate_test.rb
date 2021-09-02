@@ -28,11 +28,11 @@ module ParamsReady
         definition.create
       end
 
-      def get_hash_set_predicate
+      def get_enum_set_predicate
         builder = FixedOperatorPredicateBuilder.instance :stage_in, altn: :stg_in, attr: :stage
         builder.operator :in
 
-        builder.type :hash_set do
+        builder.type :enum_set do
           add(:pending) { optional }
           add(:processing) { optional }
           add(:complete) { optional }
@@ -251,7 +251,7 @@ module ParamsReady
       end
 
       def test_in_operator_works_with_hash_set
-        predicate = get_hash_set_predicate
+        predicate = get_enum_set_predicate
 
         predicate.set_value [:pending, :processing]
 

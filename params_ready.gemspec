@@ -47,8 +47,8 @@ Gem::Specification.new do |s|
     lib/params_ready/marshaller/builder_module.rb
     lib/params_ready/marshaller/collection.rb
     lib/params_ready/marshaller/definition_module.rb
-    lib/params_ready/marshaller/hash_marshallers.rb
-    lib/params_ready/marshaller/hash_set_marshallers.rb
+    lib/params_ready/marshaller/struct_marshallers.rb
+    lib/params_ready/marshaller/enum_set_marshallers.rb
     lib/params_ready/marshaller/parameter_module.rb
     lib/params_ready/marshaller/polymorph_marshallers.rb
     lib/params_ready/marshaller/tuple_marshallers.rb
@@ -62,11 +62,11 @@ Gem::Specification.new do |s|
     lib/params_ready/pagination/offset_pagination.rb
     lib/params_ready/pagination/tendency.rb
 
-    lib/params_ready/parameter/abstract_hash_parameter.rb
+    lib/params_ready/parameter/abstract_struct_parameter.rb
     lib/params_ready/parameter/array_parameter.rb
     lib/params_ready/parameter/definition.rb
-    lib/params_ready/parameter/hash_parameter.rb
-    lib/params_ready/parameter/hash_set_parameter.rb
+    lib/params_ready/parameter/struct_parameter.rb
+    lib/params_ready/parameter/enum_set_parameter.rb
     lib/params_ready/parameter/parameter.rb
     lib/params_ready/parameter/polymorph_parameter.rb
     lib/params_ready/parameter/state.rb

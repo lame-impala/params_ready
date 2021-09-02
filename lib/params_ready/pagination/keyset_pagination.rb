@@ -1,4 +1,4 @@
-require_relative '../parameter/hash_parameter'
+require_relative '../parameter/struct_parameter'
 require_relative '../value/constraint'
 require_relative '../helpers/arel_builder'
 require_relative 'abstract_pagination'
@@ -6,7 +6,7 @@ require_relative 'direction'
 
 module ParamsReady
   module Pagination
-    class KeysetPagination < Parameter::HashParameter
+    class KeysetPagination < Parameter::StructParameter
       include AbstractPagination
 
       def select_keysets(query, limit, direction, keyset, ordering, arel_table, context)
@@ -177,7 +177,7 @@ module ParamsReady
       end
     end
 
-    class KeysetPaginationDefinition < Parameter::HashParameterDefinition
+    class KeysetPaginationDefinition < Parameter::StructParameterDefinition
       MIN_LIMIT = 1
 
       parameter_class KeysetPagination
@@ -212,14 +212,14 @@ module ParamsReady
     class KeysetPaginationBuilder
       def initialize(ordering_builder, default_limit, max_limit = nil)
         definition = KeysetPaginationDefinition.new(default_limit, max_limit)
-        @cursor_builder = Parameter::HashParameterBuilder.send :new, definition
+        @cursor_builder = Parameter::StructParameterBuilder.send :new, definition
         @default = {
           limit: default_limit,
           direction: :aft,
           keyset: {}
         }
         @ordering_builder = ordering_builder
-        @keyset = Parameter::HashParameterBuilder.instance(:keyset, altn: :ks)
+        @keyset = Parameter::StructParameterBuilder.instance(:keyset, altn: :ks)
       end
 
       def key(type, name, direction, &block)

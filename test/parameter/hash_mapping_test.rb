@@ -1,10 +1,10 @@
 require_relative '../test_helper'
-require_relative '../../lib/params_ready/parameter/hash_parameter'
+require_relative '../../lib/params_ready/parameter/struct_parameter'
 require_relative '../../lib/params_ready/input_context'
 
 module ParamsReady
   module Parameter
-    module HashParameterNameMappingTestHelper
+    module StructParameterNameMappingTestHelper
       def input
         {
           data: {
@@ -32,8 +32,8 @@ module ParamsReady
       end
     end
 
-    class HashParameterAltnMapping < Minitest::Test
-      include HashParameterNameMappingTestHelper
+    class StructParameterAltnMapping < Minitest::Test
+      include StructParameterNameMappingTestHelper
 
       def get_def
         Builder.define_hash(:parameter, altn: [:parameter, :data]) do
@@ -67,8 +67,8 @@ module ParamsReady
       end
     end
 
-    class HashParameterNameMapping < Minitest::Test
-      include HashParameterNameMappingTestHelper
+    class StructParameterNameMapping < Minitest::Test
+      include StructParameterNameMappingTestHelper
 
       def get_def
         Builder.define_hash(:parameter) do
@@ -123,7 +123,7 @@ module ParamsReady
       end
     end
 
-    class HashParameterNameSharing < Minitest::Test
+    class StructParameterNameSharing < Minitest::Test
       def test_shared_params_are_retrieved_from_hash
         d = Builder.define_hash(:parameter) do
           add :hash, :share_a, altn: :shared do

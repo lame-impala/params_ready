@@ -1,12 +1,12 @@
 require_relative '../test_helper'
-require_relative '../../lib/params_ready/parameter/hash_parameter'
+require_relative '../../lib/params_ready/parameter/struct_parameter'
 require_relative '../../lib/params_ready/parameter/value_parameter'
 require_relative '../../lib/params_ready/input_context'
 require_relative '../../lib/params_ready/result'
 
 module ParamsReady
   module Parameter
-    module HashParameterTestHelper
+    module StructParameterTestHelper
       def get_param_definition(default: Extensions::Undefined, optional: false, preprocessor: nil, populator: nil, postprocessor: nil)
         d = Builder.define_hash(:parameter, altn: :param) do
           add(:boolean, :checked, altn: :chck) do
@@ -83,8 +83,8 @@ module ParamsReady
       end
     end
 
-    class HashParameterTest < Minitest::Test
-      include HashParameterTestHelper
+    class StructParameterTest < Minitest::Test
+      include StructParameterTestHelper
 
       def test_dup_unfreezes_a_frozen_hash
         d = get_param_definition
@@ -345,7 +345,7 @@ module ParamsReady
         assert_equal("", p[:search].unwrap)
       end
 
-      def test_uninitialized_hash_parameter_raises_when_child_queried
+      def test_uninitialized_struct_parameter_raises_when_child_queried
         p = get_param
         exc = assert_raises do
           p[:checked]
@@ -364,19 +364,19 @@ module ParamsReady
         assert_equal 'foo', h[:search]
       end
 
-      def test_uninitialized_hash_parameter_is_fully_initialized_by_assignment
+      def test_uninitialized_struct_parameter_is_fully_initialized_by_assignment
         p = get_param
         p[:search] = "jack"
         p.freeze
         assert_equal(false, p[:checked].unwrap)
       end
 
-      def test_uninitialized_optional_hash_parameter_returns_nil_when_child_queried
+      def test_uninitialized_optional_struct_parameter_returns_nil_when_child_queried
         p = get_param optional: true
         assert_nil(p[:checked])
       end
 
-      def test_hash_parameter_writes_nil_if_value_is_default
+      def test_struct_parameter_writes_nil_if_value_is_default
         p = get_param default: { checked: true, detail: 3 }
         assert_equal true, p[:checked].unwrap
         assert_equal 3, p[:detail].unwrap
@@ -384,12 +384,12 @@ module ParamsReady
         assert_nil(p.to_hash_if_eligible(Intent.instance(:frontend)))
       end
 
-      def test_hash_parameter_writes_everything_if_value_is_default_and_default_not_omitted
+      def test_struct_parameter_writes_everything_if_value_is_default_and_default_not_omitted
         p = get_param default: { checked: true, detail: 3 }
         assert_equal({ parameter: { checked: true, detail: 3, search: "" }}, p.to_hash_if_eligible(Intent.instance(:backend)))
       end
 
-      def test_hash_parameter_omits_default_values_on_write_if_some_values_differ_from_default
+      def test_struct_parameter_omits_default_values_on_write_if_some_values_differ_from_default
         p = get_param default: { checked: true, detail: 3 }
         p[:checked] = false
         p[:detail] = 5
@@ -398,7 +398,7 @@ module ParamsReady
         assert_equal({ param: {dt: '5', srch: 'joe' }}, p.to_hash_if_eligible(Intent.instance(:frontend)))
       end
 
-      def test_hash_parameter_set_to_correct_values_or_defaults_from_populated_hash
+      def test_struct_parameter_set_to_correct_values_or_defaults_from_populated_hash
         d = get_param_definition
         _, p = d.from_hash({ param: { srch: 'kate' }})
         assert_equal false, p[:checked].unwrap
@@ -524,7 +524,7 @@ module ParamsReady
       end
     end
 
-    class HashWithNonOptionalChildrenBehaviour < Minitest::Test
+    class StructWithNonOptionalChildrenBehaviour < Minitest::Test
       def get_def
         Builder.define_hash :param do
           add :hash, :nested do
@@ -589,8 +589,8 @@ module ParamsReady
       end
     end
 
-    class HashOptionalDefaultBeviour < Minitest::Test
-      include HashParameterTestHelper
+    class StructOptionalDefaultBeviour < Minitest::Test
+      include StructParameterTestHelper
 
       def test_writes_nil_if_undefined_and_formatting_is_minify_only
         p = get_param default: { checked: true, detail: 3, search: 'some' }, optional: true
@@ -614,8 +614,8 @@ module ParamsReady
       end
     end
 
-    class HashDefaultBehaviour < Minitest::Test
-      include HashParameterTestHelper
+    class StructDefaultBehaviour < Minitest::Test
+      include StructParameterTestHelper
 
       def test_writes_empty_hash_if_values_eq_defaults_and_not_overall_default_and_formatting_is_minify_only
         p = get_param default: { checked: true, detail: 3, search: 'some' }
@@ -674,8 +674,8 @@ module ParamsReady
       end
     end
 
-    class HashNilDefaultBehaviour < Minitest::Test
-      include HashParameterTestHelper
+    class StructNilDefaultBehaviour < Minitest::Test
+      include StructParameterTestHelper
 
       def test_writes_nil_if_the_value_is_default
         p = get_param default: nil
@@ -729,8 +729,8 @@ module ParamsReady
       end
     end
 
-    class HashOptionalBehaviour < Minitest::Test
-      include HashParameterTestHelper
+    class StructOptionalBehaviour < Minitest::Test
+      include StructParameterTestHelper
 
       def test_writes_nil_when_intent_minimal_and_parameter_uninitialized
         p = get_param optional: true
@@ -817,7 +817,7 @@ module ParamsReady
       end
     end
 
-    class EqualEqlHashTest < Minitest::Test
+    class EqualEqlStructTest < Minitest::Test
       def get_def
         Builder.define_hash :test do
           add :integer, :a

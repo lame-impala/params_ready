@@ -1,6 +1,6 @@
 require_relative 'parameter'
 require_relative '../helpers/key_map'
-require_relative '../marshaller/hash_marshallers'
+require_relative '../marshaller/struct_marshallers'
 require_relative '../marshaller/builder_module'
 require_relative '../marshaller/definition_module'
 
@@ -8,7 +8,7 @@ module ParamsReady
   module Parameter
     using Extensions::Hash
 
-    class AbstractHashParameter < Parameter
+    class AbstractStructParameter < Parameter
       include ComplexParameter
 
       def_delegators :@definition, :names, :remap?
@@ -132,10 +132,10 @@ module ParamsReady
       end
     end
 
-    module AbstractHashParameterBuilder
+    module AbstractStructParameterBuilder
       include Marshaller::BuilderModule
 
-      module HashLike
+      module StructLike
         def add(input, *args, **opts, &block)
           definition = self.class.resolve(input, *args, **opts, &block)
           @definition.add_child definition
@@ -143,7 +143,7 @@ module ParamsReady
       end
     end
 
-    class AbstractHashParameterDefinition < Definition
+    class AbstractStructParameterDefinition < Definition
       attr_reader :key_map
 
       def duplicate_value(value)
