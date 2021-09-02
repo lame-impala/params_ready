@@ -110,7 +110,7 @@ Gem::Specification.new do |s|
     lib/params_ready.rb
   ]
   s.add_dependency 'ruby2_keywords', '~> 0'
-  s.add_dependency 'activerecord', '~> 6'
+  s.add_dependency 'activerecord', '>= 5'
   s.add_development_dependency 'byebug', '~> 11'
   s.add_development_dependency 'memory_profiler', '~> 0.9'
   s.add_development_dependency 'minitest-rg', '~> 5'

@@ -11,7 +11,7 @@ module Arel # :nodoc: all
   end
 
   module Visitors
-    class ToSql < Visitor
+    class ToSql < Reduce
       def visit_Arel_Nodes_CteName(o, collector)
         collector << o.expr
       end
