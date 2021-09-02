@@ -5,6 +5,14 @@ module ParamsReady
         self
       end
 
+      def self.present?
+        false
+      end
+
+      def self.blank?
+        true
+      end
+      
       def self.value_indefinite?(value)
         value == self || value.nil?
       end
