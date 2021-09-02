@@ -5,7 +5,7 @@ module ParamsReady
   module Parameter
     class NoInputParameterTest < Minitest::Test
       def get_no_input_param(rule:, populator: nil)
-        Builder.define_hash(:parameter, altn: :param) do
+        Builder.define_struct(:parameter, altn: :param) do
           add(:symbol, :origin, altn: :orig) do
             no_input :cashdesk, rule: rule
             include &populator unless populator.nil?
@@ -50,7 +50,7 @@ module ParamsReady
 
     class LocalParameterTest < Minitest::Test
       def get_local_param
-        Builder.define_hash(:parameter, altn: :param) do
+        Builder.define_struct(:parameter, altn: :param) do
           add(:boolean, :checked, altn: :chck) do
             default false
           end

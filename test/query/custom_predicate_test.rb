@@ -7,7 +7,7 @@ module ParamsReady
     class DynamicCustomPredicateTest < Minitest::Test
       def get_predicate
         CustomPredicateBuilder.instance(:created).include do
-          type :hash do
+          type :struct do
             add(:integer, :days) { optional }
             add :symbol, :operator do
               constrain :enum, [:gt, :lt]
@@ -64,7 +64,7 @@ module ParamsReady
     class CustomPredicateTest < Minitest::Test
       def get_predicate
         builder = CustomPredicateBuilder.instance :custom, altn: :cst
-        builder.type :hash do
+        builder.type :struct do
           add :integer, :role, altn: :rl
           add :string, :email, altn: :eml
         end

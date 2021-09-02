@@ -23,7 +23,7 @@ module ParamsReady
           type :string, :simple, altn: :spl do
             default 'default'
           end
-          type :hash, :complex, altn: :cpx do
+          type :struct, :complex, altn: :cpx do
             add :integer, :first, altn: :fst
             add :string, :second, altn: :scd
           end
@@ -177,7 +177,7 @@ module ParamsReady
       _, p = ContextUsingParameter.get_def.from_input({ using_context: 5 })
       p[:using_context] = 6
 
-      data = Builder.define_hash :data do
+      data = Builder.define_struct :data do
         add :integer, :dec
       end.from_input({ dec: 1 }).last.freeze
 

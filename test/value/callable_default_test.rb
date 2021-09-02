@@ -32,7 +32,7 @@ module ParamsReady
 
   class CallableDefaultTest < Minitest::Test
     def get_def(local_d, default_d)
-      Builder.define_parameter :hash, :test do
+      Builder.define_parameter :struct, :test do
         add :integer, :local do
           local Helpers::Callable.new &local_d
         end

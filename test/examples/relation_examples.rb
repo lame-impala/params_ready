@@ -53,7 +53,7 @@ module ParamsReady
             optional
           end
           custom_predicate :active_custom_predicate do
-            type :hash do
+            type :struct do
               add(:integer, :days_ago) { default 1 }
               add(:boolean, :checked) { optional }
               default :inferred

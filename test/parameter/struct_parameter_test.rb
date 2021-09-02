@@ -8,7 +8,7 @@ module ParamsReady
   module Parameter
     module StructParameterTestHelper
       def get_param_definition(default: Extensions::Undefined, optional: false, preprocessor: nil, populator: nil, postprocessor: nil)
-        d = Builder.define_hash(:parameter, altn: :param) do
+        d = Builder.define_struct(:parameter, altn: :param) do
           add(:boolean, :checked, altn: :chck) do
             default false
           end
@@ -226,7 +226,7 @@ module ParamsReady
 
       def test_child_can_not_be_added_after_default_has_been_set
         err = assert_raises do
-          Builder.define_hash(:faulty) do
+          Builder.define_struct(:faulty) do
             add :integer, :first
             default first: 0
             add :integer, :second
@@ -245,7 +245,7 @@ module ParamsReady
             optional
           end
         end
-        d = Builder.define_hash :includer do
+        d = Builder.define_struct :includer do
           include &block
         end
         assert_equal [:number, :search], d.names.keys
@@ -419,9 +419,9 @@ module ParamsReady
 
     class Base64MarshallerTest < Minitest::Test
       def get_def
-        Builder.define_hash(:parameter, altn: :param) do
+        Builder.define_struct(:parameter, altn: :param) do
           add(:string, :type)
-          add(:hash, :user) do
+          add(:struct, :user) do
             add(:string, :name)
             add(:integer, :role)
           end
@@ -442,7 +442,7 @@ module ParamsReady
 
     class RestrictionIntentBehaviour < Minitest::Test
       def get_param
-        Builder.define_hash(:parameter, altn: :parameter) do
+        Builder.define_struct(:parameter, altn: :parameter) do
           add(:string, :name) do
             optional
           end
@@ -459,7 +459,7 @@ module ParamsReady
             optional
           end
           add(:array, :people) do
-            prototype :hash, :person do
+            prototype :struct, :person do
               add :string, :name
               add :string, :job do
                 optional
@@ -526,8 +526,8 @@ module ParamsReady
 
     class StructWithNonOptionalChildrenBehaviour < Minitest::Test
       def get_def
-        Builder.define_hash :param do
-          add :hash, :nested do
+        Builder.define_struct :param do
+          add :struct, :nested do
             add :integer, :number do
               constrain :operator, :<=, 10, strategy: :undefine
             end
@@ -819,7 +819,7 @@ module ParamsReady
 
     class EqualEqlStructTest < Minitest::Test
       def get_def
-        Builder.define_hash :test do
+        Builder.define_struct :test do
           add :integer, :a
           add :string, :b
         end

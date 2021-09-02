@@ -8,9 +8,9 @@ require_relative '../lib/params_ready/input_context'
 class S
   include ParamsReady::ParameterDefiner
 
-  define_parameter(:hash, :complex, altn: :cpx) do
+  define_parameter(:struct, :complex, altn: :cpx) do
     add :array, :nested_attrs, altn: :na do
-      prototype :hash do
+      prototype :struct do
         add :string, :name
         add :integer, :id
         add :date, :valid_thru

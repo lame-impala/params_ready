@@ -320,7 +320,7 @@ module ParamsReady
     class ArrayParameterUpdateInTest < Minitest::Test
       def get_def
         Builder.define_array :updating do
-          prototype :hash do
+          prototype :struct do
             add :integer, :detail
             add :string, :search
           end

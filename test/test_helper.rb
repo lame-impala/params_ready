@@ -253,7 +253,7 @@ class Company < DummyModel
 end
 
 def get_complex_param_definition
-  ParamsReady::Builder.define_hash(:parameter, altn: :parameter) do
+  ParamsReady::Builder.define_struct(:parameter, altn: :parameter) do
     add(:string, :detail, altn: :d) do
       optional
     end
@@ -261,7 +261,7 @@ def get_complex_param_definition
       prototype :integer, :role
       optional
     end
-    add(:hash, :actions, altn: :aa) do
+    add(:struct, :actions, altn: :aa) do
       add(:boolean, :view, altn: :v) do
         optional
       end

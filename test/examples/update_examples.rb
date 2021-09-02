@@ -5,8 +5,8 @@ module ParamsReady
   module Examples
     class UpdateExamples < Minitest::Test
       def test_update_if_in_works
-        definition = Builder.define_hash :parameter do
-          add :hash, :inner do
+        definition = Builder.define_struct :parameter do
+          add :struct, :inner do
             add :integer, :a
             add :integer, :b
           end

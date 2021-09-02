@@ -5,7 +5,7 @@ module ParamsReady
   module Examples
     class MinificationExamples < Minitest::Test
       def test_minification_example_works
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add :string, :default_parameter do
             default 'FOO'
           end

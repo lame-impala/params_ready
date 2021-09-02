@@ -6,7 +6,7 @@ module ParamsReady
   module Parameter
     class BehaviourWithAttributesIntent < Minitest::Test
       def test_nil_values_are_not_omitted_if_default_is_nil
-        d = Builder.define_hash(:parameter, altn: :parameter) do
+        d = Builder.define_struct(:parameter, altn: :parameter) do
           add(:string, :detail) do
             default 'N/A'
           end
@@ -70,7 +70,7 @@ module ParamsReady
 
     class StructParameterForModelTest < Minitest::Test
       def get_def
-        Builder.define_hash :model do
+        Builder.define_struct :model do
           add :string, :name
           add :integer, :role do
             default 2

@@ -5,7 +5,7 @@ module ParamsReady
   module Examples
     class StructExamples < Minitest::Test
       def test_example_hash_definition_using_convenience_methods_is_legal
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add(:boolean, :checked) do
             default false
           end
@@ -29,7 +29,7 @@ module ParamsReady
           optional
         end
 
-        parameter = Builder.define_hash(:action) do
+        parameter = Builder.define_struct(:action) do
           add checked
           add search
         end.create
@@ -40,7 +40,7 @@ module ParamsReady
       end
 
       def test_inferred_default_works
-        parameter = Builder.define_hash :parameter do
+        parameter = Builder.define_struct :parameter do
           add :integer, :int do
             default 5
           end
@@ -54,7 +54,7 @@ module ParamsReady
       end
 
       def test_base64_marshaller_works
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add :integer, :int
           add :string, :str
           marshal using: :base64

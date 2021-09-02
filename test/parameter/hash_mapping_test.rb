@@ -36,12 +36,12 @@ module ParamsReady
       include StructParameterNameMappingTestHelper
 
       def get_def
-        Builder.define_hash(:parameter, altn: [:parameter, :data]) do
+        Builder.define_struct(:parameter, altn: [:parameter, :data]) do
           add :string, :name, altn: [:attributes, :name]
           add :integer, :price, altn: [:attributes, :price]
           add :integer, :object_type_id, altn: [:associations, :'object-type', :data, :id]
           add :array, :accessory_attributes, altn: :accessories do
-            prototype :hash do
+            prototype :struct do
               add :integer, :id, altn: [:data, :id]
               add :integer, :quantity, altn: [:data, :quantity]
             end
@@ -71,12 +71,12 @@ module ParamsReady
       include StructParameterNameMappingTestHelper
 
       def get_def
-        Builder.define_hash(:parameter) do
+        Builder.define_struct(:parameter) do
           add :string, :name
           add :integer, :price
           add :integer, :object_type_id
           add :array, :accessory_attributes do
-            prototype :hash do
+            prototype :struct do
               add :integer, :id
               add :integer, :quantity
               map [:data, [:id, :quantity]] => [[:id, :quantity]]
@@ -125,20 +125,20 @@ module ParamsReady
 
     class StructParameterNameSharing < Minitest::Test
       def test_shared_params_are_retrieved_from_hash
-        d = Builder.define_hash(:parameter) do
-          add :hash, :share_a, altn: :shared do
+        d = Builder.define_struct(:parameter) do
+          add :struct, :share_a, altn: :shared do
             add :integer, :a
             add :string, :ab
-            add :hash, :shared do
+            add :struct, :shared do
               add :integer, :a
               add :string, :ab
             end
           end
 
-          add :hash, :share_b, altn: :shared do
+          add :struct, :share_b, altn: :shared do
             add :integer, :b
             add :string, :ab
-            add :hash, :shared do
+            add :struct, :shared do
               add :integer, :b
               add :string, :ab
             end

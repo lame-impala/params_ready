@@ -112,7 +112,7 @@ module ParamsReady
     end
 
     def get_json_param
-      Builder.define_hash :json do
+      Builder.define_struct :json do
         add :integer, :integer do
           optional
         end
@@ -244,7 +244,7 @@ module ParamsReady
     end
 
     def get_data_def
-      Builder.define_hash :data do
+      Builder.define_struct :data do
         add :string, :key
       end
     end

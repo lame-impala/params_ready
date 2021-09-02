@@ -95,7 +95,7 @@ module ParamsReady
 
       def test_restriction_works
         d = get_definition
-        p = Builder.define_parameter :hash, :parameter, altn: :p do
+        p = Builder.define_parameter :struct, :parameter, altn: :p do
           add d
         end.create
         p.set_value(grouping: value1)

@@ -92,7 +92,7 @@ module ParamsReady
 
     class MemoParamTest < Minitest::Test
       def get_def(memo:)
-        Builder.define_hash :memo do
+        Builder.define_struct :memo do
           add :string, :str
           add :integer, :int
           memoize if memo
@@ -213,7 +213,7 @@ module ParamsReady
 
       def get_complex_def
         memo = get_def(memo: true)
-        Builder.define_hash :wrapper do
+        Builder.define_struct :wrapper do
           add memo
           add :string, :name
         end

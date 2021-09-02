@@ -6,7 +6,7 @@ module ParamsReady
     class CodeReuseExamples < Minitest::Test
       def test_code_reuse_example_with_definition_works
         child = Builder.define_string :child
-        parameter = Builder.define_hash :parameter do
+        parameter = Builder.define_struct :parameter do
           add child
         end
         assert parameter.has_child? :child
@@ -16,7 +16,7 @@ module ParamsReady
         child_proc = proc do
           add :string, :child
         end
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           include &child_proc
         end
         assert definition.has_child? :child

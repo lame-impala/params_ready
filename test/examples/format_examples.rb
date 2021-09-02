@@ -5,7 +5,7 @@ module ParamsReady
   module Examples
     class FormatExamples < Minitest::Test
       def test_marshal_date_only_format_works
-        parameter = Builder.define_hash :parameter do
+        parameter = Builder.define_struct :parameter do
           add :integer, :integer_parameter
           add :date, :date_parameter
         end.create

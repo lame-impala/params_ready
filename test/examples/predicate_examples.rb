@@ -140,7 +140,7 @@ module ParamsReady
 
       def test_custom_predicate_example_works
         definition = Query::CustomPredicateBuilder.instance(:search_by_name).include do
-          type :hash do
+          type :struct do
             add :string, :search
             add :symbol, :operator do
               constrain :enum, %i(equal like)

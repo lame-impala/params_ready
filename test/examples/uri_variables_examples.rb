@@ -5,12 +5,12 @@ module ParamsReady
   module Examples
     class UriVariablesExamples < Minitest::Test
       def get_parameter
-        definition = Builder.define_hash :parameter do
-          add :hash, :users do
+        definition = Builder.define_struct :parameter do
+          add :struct, :users do
             add(:string, :name_match){ optional }
             add(:integer, :offset){ default 0 }
           end
-          add :hash, :posts do
+          add :struct, :posts do
             add(:integer, :user_id){ optional }
             add(:string, :subject_match){ optional }
             add(:integer, :offset){ default 0 }

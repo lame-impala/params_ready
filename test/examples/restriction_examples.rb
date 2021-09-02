@@ -5,13 +5,13 @@ module ParamsReady
   module Examples
     class RestrictionExamples < Minitest::Test
       def test_restriction_example_works
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add :string, :allowed
           add :integer, :disallowed
-          add :hash, :allowed_as_a_whole do
+          add :struct, :allowed_as_a_whole do
             add :integer, :allowed_by_inclusion
           end
-          add :hash, :partially_allowed do
+          add :struct, :partially_allowed do
             add :integer, :allowed
             add :integer, :disallowed
           end
@@ -53,9 +53,9 @@ module ParamsReady
       end
 
       def test_restriction_with_array_example_works
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add :array, :partially_allowed do
-            prototype :hash, :allowed_along_with_parent do
+            prototype :struct, :allowed_along_with_parent do
               add :string, :explicitly_allowed
               add :integer, :disallowed_by_omission
             end

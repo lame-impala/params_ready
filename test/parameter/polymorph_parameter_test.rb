@@ -40,7 +40,7 @@ module ParamsReady
           type :string, :simple, altn: :spl do
             default 'default'
           end
-          type :hash, :complex, altn: :cpx do
+          type :struct, :complex, altn: :cpx do
             add :integer, :first, altn: :fst
             add :string, :second, altn: :scd
           end
@@ -263,7 +263,7 @@ module ParamsReady
       def get_def
         Builder.define_polymorph :updating do
           identifier :ppt
-          type :hash, :complex do
+          type :struct, :complex do
             add :integer, :detail
             add :string, :search
           end

@@ -7,7 +7,7 @@ module ParamsReady
   module Value
     class NonEmptyStringTest < Minitest::Test
       def test_undefined_can_be_passed_in_from_coder
-        d = Builder.define_hash :dump_empty do
+        d = Builder.define_struct :dump_empty do
           add :non_empty_string, :never_empty do
             optional
           end

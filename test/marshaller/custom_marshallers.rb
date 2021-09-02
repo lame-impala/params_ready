@@ -78,7 +78,7 @@ module ParamsReady
       end
 
       def test_binary_flag_works
-        d = Builder.define_hash_set :binary_flag do
+        d = Builder.define_enum_set :binary_flag do
           add :good
           add :bad
           add :ugly
@@ -118,7 +118,7 @@ module ParamsReady
       end
 
       def test_array_to_hash_works
-        d = Builder.define_hash :key_info do
+        d = Builder.define_struct :key_info do
           add :string, :key, altn: [:pk, :value]
           add :integer, :kid, altn: [:kid, :value]
           marshal to: Array, using: StructToArray.new('item').freeze
@@ -132,7 +132,7 @@ module ParamsReady
       end
 
       def test_remap_works_with_custom_hash_marshaller
-        d = Builder.define_hash :remap do
+        d = Builder.define_struct :remap do
           add :string, :key
           add :integer, :kid
           map [:pk, [:value]] => [[:key]]

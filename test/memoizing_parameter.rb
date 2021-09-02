@@ -4,11 +4,11 @@ require_relative '../lib/params_ready/parameter_definer'
 class SM
   include ParamsReady::ParameterDefiner
 
-  define_parameter(:hash, :complex, altn: :cpx) do
+  define_parameter(:struct, :complex, altn: :cpx) do
     memoize
 
     add :array, :nested_attrs, altn: :na do
-      prototype :hash do
+      prototype :struct do
         add :string, :name
         add :integer, :id
         add :date, :valid_thru

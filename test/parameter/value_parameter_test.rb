@@ -278,7 +278,7 @@ module ParamsReady
       end
 
       def test_update_in_works_with_raising_constraint
-        d = Builder.define_hash(:param) do
+        d = Builder.define_struct(:param) do
           add :integer, :number do
             constrain :operator, :<=, 10, strategy: :raise
           end
@@ -293,7 +293,7 @@ module ParamsReady
       end
 
       def test_update_in_works_with_undefining_constraint
-        d = Builder.define_hash(:param) do
+        d = Builder.define_struct(:param) do
           add :integer, :number do
             constrain :operator, :<=, 10, strategy: :undefine
             default 3
@@ -308,7 +308,7 @@ module ParamsReady
       end
 
       def test_update_in_works_with_clamping_constraint
-        d = Builder.define_hash(:param) do
+        d = Builder.define_struct(:param) do
           add :integer, :number do
             constrain :operator, :<=, 10, strategy: :clamp
           end
@@ -334,7 +334,7 @@ module ParamsReady
         d = ContextUsingParameter.get_def
         p = d.create
         p[:using_context] = 6
-        _, data = Builder.define_hash :data do
+        _, data = Builder.define_struct :data do
           add :integer, :dec
         end.from_input({ dec: 1 })
         data = data.freeze

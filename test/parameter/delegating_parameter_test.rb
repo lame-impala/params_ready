@@ -130,8 +130,8 @@ module ParamsReady
     class UpdateInForDelegatingParameterTest < Minitest::Test
       def get_def
         Query::StructuredGroupingBuilder.instance(:grouping).include do
-          custom_predicate :hash_based do
-            type :hash do
+          custom_predicate :struct_based do
+            type :struct do
               add :integer, :detail do
                 default 0
               end
@@ -146,59 +146,59 @@ module ParamsReady
       end
 
       def initial_value
-        { grouping: { hash_based: { detail: 5, search: 'stuff' }}}
+        { grouping: { struct_based: { detail: 5, search: 'stuff' }}}
       end
 
       def test_update_if_applicable_called_on_self_works_with_unfrozen_param
         d = get_def
         _, p = d.from_hash(initial_value, context: :backend)
-        changed, u = p.update_if_applicable({ detail: 4, search: 'other'}, [:hash_based])
+        changed, u = p.update_if_applicable({ detail: 4, search: 'other'}, [:struct_based])
         assert changed
         refute u.frozen?
-        refute u[:hash_based].frozen?
-        refute u[:hash_based][:search].frozen?
+        refute u[:struct_based].frozen?
+        refute u[:struct_based][:search].frozen?
 
-        assert_equal 4, u[:hash_based][:detail].unwrap
-        assert_equal 'other', u[:hash_based][:search].unwrap
+        assert_equal 4, u[:struct_based][:detail].unwrap
+        assert_equal 'other', u[:struct_based][:search].unwrap
         assert_different p, u
-        assert_different p[:hash_based], u[:hash_based]
-        assert_different p[:hash_based][:search], u[:hash_based][:search]
+        assert_different p[:struct_based], u[:struct_based]
+        assert_different p[:struct_based][:search], u[:struct_based][:search]
       end
 
       def test_update_if_applicable_called_on_self_works_with_frozen_param
         d = get_def
         _, p = d.from_hash(initial_value, context: :backend)
         p.freeze
-        changed, u = p.update_if_applicable({ detail: 4, search: 'other'}, [:hash_based])
+        changed, u = p.update_if_applicable({ detail: 4, search: 'other'}, [:struct_based])
         assert changed
         assert u.frozen?
-        assert u[:hash_based].frozen?
-        assert u[:hash_based][:search].frozen?
+        assert u[:struct_based].frozen?
+        assert u[:struct_based][:search].frozen?
 
-        assert_equal 4, u[:hash_based][:detail].unwrap
-        assert_equal 'other', u[:hash_based][:search].unwrap
+        assert_equal 4, u[:struct_based][:detail].unwrap
+        assert_equal 'other', u[:struct_based][:search].unwrap
         assert_different p, u
-        assert_different p[:hash_based], u[:hash_based]
-        assert_different p[:hash_based][:search], u[:hash_based][:search]
+        assert_different p[:struct_based], u[:struct_based]
+        assert_different p[:struct_based][:search], u[:struct_based][:search]
       end
 
       def test_update_if_applicable_called_on_child_with_different_value_works_with_unfrozen_param
         d = get_def
         _, p = d.from_hash(initial_value, context: :backend)
 
-        changed, u = p.update_if_applicable('other', [:hash_based, :search])
+        changed, u = p.update_if_applicable('other', [:struct_based, :search])
         assert changed
         refute u.frozen?
-        refute u[:hash_based].frozen?
-        refute u[:hash_based][:detail].frozen?
-        refute u[:hash_based][:search].frozen?
+        refute u[:struct_based].frozen?
+        refute u[:struct_based][:detail].frozen?
+        refute u[:struct_based][:search].frozen?
 
-        assert_equal 5, u[:hash_based][:detail].unwrap
-        assert_equal 'other', u[:hash_based][:search].unwrap
+        assert_equal 5, u[:struct_based][:detail].unwrap
+        assert_equal 'other', u[:struct_based][:search].unwrap
         assert_different p, u
-        assert_different p[:hash_based], u[:hash_based]
-        assert_different p[:hash_based][:detail], u[:hash_based][:detail]
-        assert_different p[:hash_based][:search], u[:hash_based][:search]
+        assert_different p[:struct_based], u[:struct_based]
+        assert_different p[:struct_based][:detail], u[:struct_based][:detail]
+        assert_different p[:struct_based][:search], u[:struct_based][:search]
       end
 
       def test_update_if_applicable_called_on_child_with_different_value_works_with_frozen_param
@@ -206,20 +206,20 @@ module ParamsReady
         _, p = d.from_hash(initial_value, context: :backend)
         p.freeze
 
-        changed, u = p.update_if_applicable('other', [:hash_based, :search])
+        changed, u = p.update_if_applicable('other', [:struct_based, :search])
         assert changed
 
         assert u.frozen?
-        assert u[:hash_based].frozen?
-        assert u[:hash_based][:detail].frozen?
-        assert u[:hash_based][:search].frozen?
+        assert u[:struct_based].frozen?
+        assert u[:struct_based][:detail].frozen?
+        assert u[:struct_based][:search].frozen?
 
-        assert_equal 5, u[:hash_based][:detail].unwrap
-        assert_equal 'other', u[:hash_based][:search].unwrap
+        assert_equal 5, u[:struct_based][:detail].unwrap
+        assert_equal 'other', u[:struct_based][:search].unwrap
         assert_different p, u
-        assert_different p[:hash_based], u[:hash_based]
-        assert_same p[:hash_based][:detail], u[:hash_based][:detail]
-        assert_different p[:hash_based][:search], u[:hash_based][:search]
+        assert_different p[:struct_based], u[:struct_based]
+        assert_same p[:struct_based][:detail], u[:struct_based][:detail]
+        assert_different p[:struct_based][:search], u[:struct_based][:search]
       end
 
       def test_update_if_applicable_called_on_child_with_equal_value_works_with_frozen_param
@@ -227,7 +227,7 @@ module ParamsReady
         _, p = d.from_hash(initial_value, context: :backend)
         p.freeze
 
-        changed, u = p.update_if_applicable('stuff', [:hash_based, :search])
+        changed, u = p.update_if_applicable('stuff', [:struct_based, :search])
         refute changed
 
         assert_same p, u

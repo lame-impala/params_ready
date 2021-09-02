@@ -5,7 +5,7 @@ module ParamsReady
   module Examples
     class AlternativeNameExamples < Minitest::Test
       def test_alternative_name_example_works
-        definition = Builder.define_hash :parameter, altn: :p do
+        definition = Builder.define_struct :parameter, altn: :p do
           add :string, :name, altn: :n
         end
         _, parameter = definition.from_input({ n: 'FOO' })
@@ -26,7 +26,7 @@ module ParamsReady
       end
 
       def test_output_parameters_example_works
-        definition = Builder.define_hash :complex, altn: :cpx do
+        definition = Builder.define_struct :complex, altn: :cpx do
           add :string, :string_parameter, altn: :sp
           add :array, :array_parameter, altn: :ap do
             prototype :integer
@@ -51,7 +51,7 @@ module ParamsReady
       end
 
       def test_alternative_mapping_example_works
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add :string, :remapped, altn: [:path, :to, :string]
         end
 
@@ -63,7 +63,7 @@ module ParamsReady
       end
 
       def test_mapping_example_works
-        definition = Builder.define_hash :parameter do
+        definition = Builder.define_struct :parameter do
           add :string, :foo
           add :string, :bar
           add :integer, :first

@@ -9,7 +9,7 @@ module ParamsReady
   module Parameter
     module EnumSetParameterTestHelper
       def get_conversion_param_definition
-        Builder.define_hash_set(:conversion) do
+        Builder.define_enum_set(:conversion) do
           add(:pending, val: 0) { optional }
           add(:processing, val: 1) { optional }
           add(:complete, val: 2) { optional }
@@ -21,7 +21,7 @@ module ParamsReady
       end
 
       def get_param_definition(default: Extensions::Undefined, defaults: {}, optional: false, type: :boolean)
-        d = Builder.define_hash_set(:parameter, altn: :param, type: type) do
+        d = Builder.define_enum_set(:parameter, altn: :param, type: type) do
           add(:pending, altn: :pen) do
             if defaults.key?(:pending)
               default(defaults[:pending])
@@ -58,7 +58,7 @@ module ParamsReady
 
       def test_member_can_not_be_added_after_default_has_been_set
         err = assert_raises do
-          Builder.define_hash_set(:faulty) do
+          Builder.define_enum_set(:faulty) do
             add(:pending, val: 0) { optional }
             default [:pending].to_set
             add(:processing, val: 1) { optional }
@@ -70,7 +70,7 @@ module ParamsReady
 
       def test_uniqueness_of_values_is_checked_for
         err = assert_raises do
-          Builder.define_hash_set(:conversion) do
+          Builder.define_enum_set(:conversion) do
             add(:pending, val: 0) { optional }
             add(:processing, val: 0) { optional }
           end

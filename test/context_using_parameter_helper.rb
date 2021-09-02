@@ -1,7 +1,7 @@
 require_relative '../lib/params_ready/builder'
 module ContextUsingParameter
   def self.get_def
-    ParamsReady::Builder.define_hash(:param) do
+    ParamsReady::Builder.define_struct(:param) do
       add :value, :using_context do
         coerce do |value, context|
           next value unless context.marshal? :value

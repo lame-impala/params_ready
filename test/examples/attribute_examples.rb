@@ -5,7 +5,7 @@ module ParamsReady
   module Examples
     class AttributeExamples < Minitest::Test
       def get_user_def
-        Builder.define_hash :model do
+        Builder.define_struct :model do
           add :string, :name
           add :integer, :role do
             default 2
@@ -31,7 +31,7 @@ module ParamsReady
       end
 
       def get_local_def
-        Builder.define_hash :model do
+        Builder.define_struct :model do
           add :string, :name
           add :integer, :owner_id do
             local; optional
@@ -59,7 +59,7 @@ module ParamsReady
       end
 
       def test_string_is_converted_to_valid_array
-        definition = Builder.define_hash :model do
+        definition = Builder.define_struct :model do
           add :array, :to do
             prototype :string
 
@@ -76,7 +76,7 @@ module ParamsReady
       end
 
       def test_values_are_altered_in_postprocess_block
-        definition = Builder.define_hash :model do
+        definition = Builder.define_struct :model do
           add :integer, :lower
           add :integer, :higher
 
