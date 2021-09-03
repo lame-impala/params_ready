@@ -10,6 +10,9 @@ module ParamsReady
           join_table Subscription.arel_table, :outer do
             on(:id).eq(:user_id)
           end
+          join_table Profile.arel_table, :outer do
+            on(:id).eq(:user_id)
+          end
           nullness_predicate :subscriptions_id_is_null, altn: :sub_id_is_nl, attr: :id do
             arel_table Subscription.arel_table
             associations :subscriptions
@@ -45,8 +48,9 @@ module ParamsReady
         full_query = relation.build_select
 
         exp = <<~SQL
-          SELECT * FROM users LEFT OUTER JOIN subscriptions
-          ON users.id = subscriptions.user_id
+          SELECT * FROM users 
+          LEFT OUTER JOIN subscriptions ON users.id = subscriptions.user_id
+          LEFT OUTER JOIN profiles ON users.id = profiles.user_id
           WHERE (NOT (subscriptions.id IS NULL) AND users.email LIKE '%bogus%')
           ORDER BY subscriptions.channel ASC,
           users.email ASC LIMIT 100 OFFSET 0
@@ -62,8 +66,9 @@ module ParamsReady
         relation[:subscriptions_id_is_null].set_value(false)
 
         exp = <<~SQL
-          SELECT * FROM users LEFT OUTER JOIN subscriptions
-          ON users.id = subscriptions.user_id
+          SELECT * FROM users 
+          LEFT OUTER JOIN subscriptions ON users.id = subscriptions.user_id
+          LEFT OUTER JOIN profiles ON users.id = profiles.user_id
           WHERE (users.email LIKE '%bogus%')
           ORDER BY subscriptions.channel ASC,
           users.email ASC LIMIT 100 OFFSET 0

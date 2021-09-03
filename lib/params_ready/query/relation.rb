@@ -248,9 +248,9 @@ module ParamsReady
         query
       end
 
-      def joined_tables(proper_table, context)
-        definition.joins.reduce(proper_table) do |table, join|
-          join.to_arel(table, context, self)
+      def joined_tables(base_table, context)
+        definition.joins.reduce(base_table) do |joined_table, join|
+          join.to_arel(joined_table, base_table, context, self)
         end
       end
     end

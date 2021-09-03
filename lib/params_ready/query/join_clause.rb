@@ -19,9 +19,9 @@ module ParamsReady
         end
       end
 
-      def to_arel(base_table, context, parameter)
+      def to_arel(joined_table, base_table, context, parameter)
         join_statement = @statement.to_arel(base_table, @arel_table, context, parameter)
-        base_table.join(@arel_table, @type).on(join_statement)
+        joined_table.join(@arel_table, @type).on(join_statement)
       end
     end
 
