@@ -5,7 +5,7 @@ module ParamsReady
   module Query
     class JoinTest < Minitest::Test
       def assert_condition(expected, join)
-        arel = join.to_arel(User.arel_table, {}, {}).join_sources[0]
+        arel = join.to_arel(User.arel_table, User.arel_table, {}, {}).join_sources[0]
         sql = arel.to_sql.unquote.gsub('LEFT OUTER JOIN subscriptions ON ', '')
         assert_equal(expected, sql)
       end
