@@ -1,10 +1,35 @@
 require_relative '../test_helper'
 require_relative '../../lib/params_ready/query/structured_grouping.rb'
 require_relative '../../lib/params_ready/value/validator'
+require_relative '../../lib/params_ready/helpers/callable'
+require_relative '../../lib/params_ready/query/relation'
 
 module ParamsReady
-  class StructuredGroupingTest < Minitest::Test
-    module Query
+  module Query
+    class StructuredGroupingTest < Minitest::Test
+      def get_conditional_query
+        Builder.define_relation(:users) do
+          model User
+          structured_grouping_predicate :activity do
+            add(:boolean, :checked) { default false }
+            operator { local :and }
+            fixed_operator_predicate :active, attr: :last_access do
+              operator :greater_than_or_equal
+              type(:value, :date) do
+                local Helpers::Callable.new { Date.today - 10 }
+              end
+            end
+            fixed_operator_predicate :recent_activity, attr: :recent_activity do
+              operator :greater_than_or_equal
+              type(:value, :integer) { default 1 }
+            end
+            to_query? do |_arel_table, _context|
+              self[:checked].unwrap == true
+            end
+          end
+        end
+      end
+
       def get_definition(op: :and, optional: false, predicate_default: Extensions::Undefined)
         builder = StructuredGroupingBuilder.instance(:grouping, altn: :grp)
         builder.instance_eval do
@@ -34,6 +59,29 @@ module ParamsReady
         get_definition(**opts).create
       end
 
+
+      def test_grouping_forms_query_if_not_skipped
+        input = { activity: { checked: true, recent_activity: 10 }}
+        definition = get_conditional_query
+        _, grouping = definition.from_input(input)
+        arel = grouping.build_select
+        exp = <<~SQL.squish
+          SELECT * FROM "users" WHERE ("users"."last_access" >= '2021-10-14' AND "users"."recent_activity" >= 10)
+        SQL
+        assert_equal exp, arel.to_sql
+      end
+
+      def test_grouping_returns_nil_if_skipped
+        input = { activity: { checked: false, recent_activity: 10 }}
+        definition = get_conditional_query
+        _, grouping = definition.from_input(input)
+        arel = grouping.build_select
+        exp = <<~SQL.squish
+          SELECT * FROM "users"
+        SQL
+        assert_equal exp, arel.to_sql
+      end
+
       def test_predicate_can_be_optional
         d = get_definition(optional: true)
         _, predicate = d.from_hash({})
@@ -41,7 +89,7 @@ module ParamsReady
         assert_equal({ grouping: nil }, predicate.to_hash_if_eligible(Intent.instance(:backend)))
         assert_nil predicate.unwrap
         assert_nil predicate.to_query(:whatever)
-        assert predicate.test(:whatever)
+        assert_nil predicate.test(:whatever)
       end
 
       def test_delegating_parameter_works

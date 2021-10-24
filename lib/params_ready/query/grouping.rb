@@ -48,6 +48,10 @@ module ParamsReady
         definition = Builder.define_grouping_operator(:operator, altn: :op, &block)
         add definition
       end
+
+      def to_query?(&block)
+        helper :to_query?, &block
+      end
     end
   end
 
@@ -67,10 +71,12 @@ module ParamsReady
         arel_table.grouping(subqueries)
       end
 
-      def eligible_for_query?(_table, context)
+      def eligible_for_query?(table, context)
         return false unless context.permitted? self
+        return false unless is_definite?
+        return true unless respond_to?(:to_query?)
 
-        is_definite?
+        to_query?(table, context)
       end
 
       def to_query_if_eligible(arel_table, context:)

@@ -332,7 +332,6 @@ def hash_diff(first, second)
   end
 end
 
-
 module ActionCtrl
   class Parameters
     extend Forwardable

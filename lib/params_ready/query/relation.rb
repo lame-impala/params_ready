@@ -136,7 +136,7 @@ module ParamsReady
 
       def perform_count(scope: nil, context: Restriction.blanket_permission)
         scope ||= definition.model_class if definition.model_class_defined?
-        group = predicate_group(scope.arel_table, context: context)
+        group = to_query_if_eligible(scope.arel_table, context: context)
         relation = scope.where(group)
         relation = perform_joins(relation, context)
         relation.count
@@ -144,7 +144,7 @@ module ParamsReady
 
       def keysets(limit, direction, keyset, scope: nil, context: Restriction.blanket_permission, &block)
         model_class = scope || definition.model_class
-        group = predicate_group(model_class.arel_table, context: context)
+        group = to_query_if_eligible(model_class.arel_table, context: context)
         relation = model_class.where(group)
         relation = perform_joins(relation, context)
 
@@ -156,7 +156,7 @@ module ParamsReady
 
       def build_relation(scope: nil, include: [], context: Restriction.blanket_permission, paginate: true)
         model_class = scope || definition.model_class
-        group = predicate_group(model_class.arel_table, context: context)
+        group = to_query_if_eligible(model_class.arel_table, context: context)
         relation = model_class.where(group)
         relation = relation.includes(*include) unless include.empty?
         relation = perform_joins(relation, context)
@@ -176,7 +176,7 @@ module ParamsReady
 
         arel_table = joined_tables(model_class.arel_table, context)
 
-        group = self.predicate_group(model_class.arel_table, context: context)
+        group = to_query_if_eligible(model_class.arel_table, context: context)
 
         query = if group.nil?
           arel_table
@@ -200,7 +200,7 @@ module ParamsReady
       def build_query(model_class, context)
         arel_table = arel_table(model_class)
 
-        group = self.predicate_group(arel_table, context: context)
+        group = to_query_if_eligible(arel_table, context: context)
         joined = joined_tables(arel_table, context)
 
         query = if group.nil?
@@ -210,6 +210,12 @@ module ParamsReady
         end
 
         [arel_table, query]
+      end
+
+      def to_query_if_eligible(arel_table, context:)
+        return if respond_to?(:to_query?) && !to_query?(arel_table, context)
+
+        predicate_group(arel_table, context: context)
       end
 
       def order_if_applicable(arel_table, context)
