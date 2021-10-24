@@ -45,6 +45,7 @@ require_relative 'parameter/state_test'
 
 require_relative 'query/array_grouping_test'
 require_relative 'query/keyset_pagination_relation_test'
+require_relative 'query/conditional_join_test'
 require_relative 'query/custom_predicate_test'
 require_relative 'query/exists_predicate_test'
 require_relative 'query/fixed_operator_predicate_test'

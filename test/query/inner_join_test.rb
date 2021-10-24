@@ -5,7 +5,7 @@ module ParamsReady
   module Query
     class InnerJoinTest < Minitest::Test
       def get_relation_definition
-        definition = Builder.define_relation(:subscription, altn: :sub) do
+        Builder.define_relation(:subscription, altn: :sub) do
           model Subscription
           join_table User.arel_table, :inner do
             on(:user_id).eq(:id)

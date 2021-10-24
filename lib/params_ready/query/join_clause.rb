@@ -21,6 +21,8 @@ module ParamsReady
 
       def to_arel(joined_table, base_table, context, parameter)
         join_statement = @statement.to_arel(base_table, @arel_table, context, parameter)
+        return if join_statement.nil?
+
         joined_table.join(@arel_table, @type).on(join_statement)
       end
     end
@@ -28,6 +30,7 @@ module ParamsReady
     class JoinStatement
       def initialize(on: nil, eq: nil, &block)
         @conditions = []
+        @only_if = nil
         if on
           condition = on(on)
           if eq
@@ -39,6 +42,7 @@ module ParamsReady
 
         instance_eval(&block) unless block.nil?
         raise ParamsReadyError, "Join clause is empty" if @conditions.empty?
+        freeze
       end
 
       def on(expression, arel_table: nil)
@@ -47,7 +51,13 @@ module ParamsReady
         condition
       end
 
+      def only_if(&block)
+        @only_if = block
+      end
+
       def to_arel(base_table, join_table, context, parameter)
+        return unless @only_if.nil? || @only_if.call(context)
+
         @conditions.reduce(nil) do |result, condition|
           arel = condition.to_arel(base_table, join_table, context, parameter)
           next arel if result.nil?

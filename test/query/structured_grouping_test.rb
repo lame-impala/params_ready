@@ -66,7 +66,7 @@ module ParamsReady
         _, grouping = definition.from_input(input)
         arel = grouping.build_select
         exp = <<~SQL.squish
-          SELECT * FROM "users" WHERE ("users"."last_access" >= '2021-10-14' AND "users"."recent_activity" >= 10)
+          SELECT * FROM "users" WHERE ("users"."last_access" >= '#{(Date.today - 10).strftime('%Y-%m-%d')}' AND "users"."recent_activity" >= 10)
         SQL
         assert_equal exp, arel.to_sql
       end

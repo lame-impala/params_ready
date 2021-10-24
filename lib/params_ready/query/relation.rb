@@ -256,7 +256,10 @@ module ParamsReady
 
       def joined_tables(base_table, context)
         definition.joins.reduce(base_table) do |joined_table, join|
-          join.to_arel(joined_table, base_table, context, self)
+          join = join.to_arel(joined_table, base_table, context, self)
+          next joined_table if join.nil?
+
+          join
         end
       end
     end
