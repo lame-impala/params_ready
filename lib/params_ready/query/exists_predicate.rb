@@ -66,8 +66,8 @@ module ParamsReady
       end
 
       def related(on: nil, eq: nil, &block)
-        join_statement = JoinStatement.new(on: on, eq: eq, &block)
-        @definition.set_related(join_statement)
+        join_statement = JoinStatement::Builder.new(on: on, eq: eq, &block)
+        @definition.set_related(join_statement.build)
       end
 
       def outer_table(arel_table)

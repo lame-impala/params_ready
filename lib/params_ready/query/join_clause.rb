@@ -1,14 +1,41 @@
 require_relative '../helpers/arel_builder'
+require_relative '../error'
 
 module ParamsReady
   module Query
     class Join
+      class Builder
+        def initialize(&block)
+          @block = block
+          @statement_builder = nil
+          @only_if = nil
+        end
+
+        def build
+          instance_eval(&@block)
+          @block = nil
+          raise ParamsReadyError, 'Join statement must be present' if @statement_builder.nil?
+          [@statement_builder.build, @only_if]
+        end
+
+        def on(expression, arel_table: nil)
+          @statement_builder ||= JoinStatement::Builder.new
+          @statement_builder.on(expression, arel_table: arel_table)
+        end
+
+        def only_if(&block)
+          @only_if = block
+          nil
+        end
+      end
+
       attr_reader :arel_table, :statement, :type
 
       def initialize(table, type, &block)
         @arel_table = table
         @type = arel_type(type)
-        @statement = JoinStatement.new(&block)
+        @statement, @only_if = Builder.new(&block).build
+        freeze
       end
 
       def arel_type(type)
@@ -20,44 +47,46 @@ module ParamsReady
       end
 
       def to_arel(joined_table, base_table, context, parameter)
-        join_statement = @statement.to_arel(base_table, @arel_table, context, parameter)
-        return if join_statement.nil?
+        return joined_table unless @only_if.nil? || @only_if.call(context)
 
+        join_statement = @statement.to_arel(base_table, @arel_table, context, parameter)
         joined_table.join(@arel_table, @type).on(join_statement)
       end
     end
 
     class JoinStatement
-      def initialize(on: nil, eq: nil, &block)
-        @conditions = []
-        @only_if = nil
-        if on
-          condition = on(on)
-          if eq
-            condition.eq(eq)
+      class Builder
+        def initialize(on: nil, eq: nil, &block)
+          @condition_builders = []
+          if on.nil?
+            raise ParamsReadyError, 'Parameter :eq unexpected' unless eq.nil?
+          else
+            condition = on(on)
+            condition.eq(eq) unless eq.nil?
           end
-        else
-          raise ParamsReadyError('Parameter :eq unexpected') unless eq.nil?
+          @block = block
         end
 
-        instance_eval(&block) unless block.nil?
+        def on(expression, arel_table: nil)
+          condition = JoinCondition::Builder.new(expression, arel_table: arel_table)
+          @condition_builders << condition
+          condition
+        end
+
+        def build
+          instance_eval(&@block) unless @block.nil?
+          JoinStatement.new(@condition_builders.map(&:build))
+        end
+      end
+
+      def initialize(conditions)
+        @conditions = conditions.freeze
         raise ParamsReadyError, "Join clause is empty" if @conditions.empty?
+
         freeze
       end
 
-      def on(expression, arel_table: nil)
-        condition = JoinCondition.new(expression, arel_table: arel_table)
-        @conditions << condition
-        condition
-      end
-
-      def only_if(&block)
-        @only_if = block
-      end
-
       def to_arel(base_table, join_table, context, parameter)
-        return unless @only_if.nil? || @only_if.call(context)
-
         @conditions.reduce(nil) do |result, condition|
           arel = condition.to_arel(base_table, join_table, context, parameter)
           next arel if result.nil?
@@ -68,16 +97,29 @@ module ParamsReady
     end
 
     class JoinCondition
-      def initialize(expression, arel_table: nil)
-        @on = Helpers::ArelBuilder.instance(expression, arel_table: arel_table)
-        @to = nil
-        @op = nil
+      class Builder
+        def initialize(expression, arel_table: nil)
+          @on = Helpers::ArelBuilder.instance(expression, arel_table: arel_table)
+          @op = nil
+          @to = nil
+        end
+
+        def eq(expression, arel_table: nil)
+          raise ParamsReadyError, "Operator already set" unless @op.nil?
+          @op = :eq
+          @to = Helpers::ArelBuilder.instance(expression, arel_table: arel_table)
+        end
+
+        def build
+          JoinCondition.new(@on, @op, @to)
+        end
       end
 
-      def eq(expression, arel_table: nil)
-        raise ParamsReadyError, "Operator already set" unless @op.nil?
-        @op = :eq
-        @to = Helpers::ArelBuilder.instance(expression, arel_table: arel_table)
+      def initialize(on, op, to)
+        @on = on
+        @op = op
+        @to = to
+        freeze
       end
 
       def to_arel(base_table, join_table, context, parameter)

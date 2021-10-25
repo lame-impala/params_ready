@@ -299,7 +299,6 @@ module ParamsReady
 
       def join_table(arel_table, type, &block)
         join = Join.new arel_table, type, &block
-        join.freeze
         @definition.add_join(join)
       end
     end
