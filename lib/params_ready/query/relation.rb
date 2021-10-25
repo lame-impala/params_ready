@@ -165,9 +165,12 @@ module ParamsReady
       end
 
       def perform_joins(relation, context)
-        return relation if definition.joins.empty?
+        eligible_joins = definition.joins.select do |join|
+          join.eligible?(context, self)
+        end
+        return relation if eligible_joins.empty?
 
-        sql = joined_tables(relation.arel_table, context).join_sources.map(&:to_sql).join(' ')
+        sql = join_tables(eligible_joins, relation.arel_table, context).join_sources.map(&:to_sql).join(' ')
         relation.joins(sql)
       end
 
@@ -255,7 +258,11 @@ module ParamsReady
       end
 
       def joined_tables(base_table, context)
-        definition.joins.reduce(base_table) do |joined_table, join|
+        join_tables(definition.joins, base_table, context)
+      end
+
+      def join_tables(joins, base_table, context)
+        joins.reduce(base_table) do |joined_table, join|
           join = join.to_arel(joined_table, base_table, context, self)
           next joined_table if join.nil?
 

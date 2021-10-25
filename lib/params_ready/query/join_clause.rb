@@ -51,11 +51,17 @@ module ParamsReady
       end
 
       def to_arel(joined_table, base_table, context, parameter)
-        return joined_table unless @only_if.nil? || @only_if.call(context, parameter)
+        return joined_table unless eligible?(context, parameter)
 
         arel_table = arel_table(context, parameter)
         join_statement = @statement.to_arel(base_table, arel_table, context, parameter)
         joined_table.join(arel_table, @type).on(join_statement)
+      end
+
+      def eligible?(context, parameter)
+        return true if @only_if.nil?
+
+        @only_if.call(context, parameter)
       end
     end
 
