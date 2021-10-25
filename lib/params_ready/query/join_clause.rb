@@ -31,11 +31,15 @@ module ParamsReady
 
       attr_reader :arel_table, :statement, :type
 
-      def initialize(table, type, &block)
-        @arel_table = table
+      def initialize(table, type, table_alias: nil, &block)
+        @arel_table = Helpers::ArelBuilder::Table.instance(table, table_alias: table_alias)
         @type = arel_type(type)
         @statement, @only_if = Builder.new(&block).build
         freeze
+      end
+
+      def arel_table(context, parameter)
+        @arel_table.to_arel(context, parameter)
       end
 
       def arel_type(type)
@@ -47,10 +51,11 @@ module ParamsReady
       end
 
       def to_arel(joined_table, base_table, context, parameter)
-        return joined_table unless @only_if.nil? || @only_if.call(context)
+        return joined_table unless @only_if.nil? || @only_if.call(context, parameter)
 
-        join_statement = @statement.to_arel(base_table, @arel_table, context, parameter)
-        joined_table.join(@arel_table, @type).on(join_statement)
+        arel_table = arel_table(context, parameter)
+        join_statement = @statement.to_arel(base_table, arel_table, context, parameter)
+        joined_table.join(arel_table, @type).on(join_statement)
       end
     end
 
@@ -99,7 +104,7 @@ module ParamsReady
     class JoinCondition
       class Builder
         def initialize(expression, arel_table: nil)
-          @on = Helpers::ArelBuilder.instance(expression, arel_table: arel_table)
+          @on = Helpers::ArelBuilder::Attribute.instance(expression, arel_table: arel_table)
           @op = nil
           @to = nil
         end
@@ -107,7 +112,7 @@ module ParamsReady
         def eq(expression, arel_table: nil)
           raise ParamsReadyError, "Operator already set" unless @op.nil?
           @op = :eq
-          @to = Helpers::ArelBuilder.instance(expression, arel_table: arel_table)
+          @to = Helpers::ArelBuilder::Attribute.instance(expression, arel_table: arel_table)
         end
 
         def build

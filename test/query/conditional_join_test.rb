@@ -13,7 +13,7 @@ module ParamsReady
           model User
           join_table subscription_count, :inner do
             on(:id).eq(:user_id)
-            only_if { |context| context[:join] }
+            only_if { |context, _parameter| context[:join] }
           end
           fixed_operator_predicate :num_subscriptions, attr: :sum do
             operator :greater_than_or_equal

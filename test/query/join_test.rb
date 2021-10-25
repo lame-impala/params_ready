@@ -79,6 +79,72 @@ module ParamsReady
 
         assert_condition('(users.id = subscriptions.subscriber_id)', join)
       end
+
+      def test_arel_node_works_in_place_of_arel_table
+        subscriptions = Subscription.arel_table
+        table = subscriptions.project(subscriptions[:user_id], subscriptions[:duration].sum)
+                             .group(subscriptions[:user_id])
+                             .as('subscription_durations')
+        join = Join.new(table, :inner) do
+          on(:id).eq(:user_id)
+        end
+        exp = <<~SQL.squish
+          SELECT * FROM users 
+          INNER JOIN 
+           (SELECT subscriptions.user_id, SUM(subscriptions.duration) 
+            FROM subscriptions 
+            GROUP BY subscriptions.user_id) subscription_durations 
+          ON users.id = subscription_durations.user_id
+        SQL
+        assert_equal exp, join.to_arel(User.arel_table, User.arel_table, {}, {}).project(Arel.star).to_sql.unquote
+      end
+
+      def test_proc_works_in_place_of_arel_table
+        subscriptions = Subscription.arel_table
+        table = proc { |context, _parameter|
+          subscriptions.project(subscriptions[:user_id], subscriptions[:duration].sum)
+                       .where(subscriptions[:thru].lteq(context[:date]))
+                       .group(subscriptions[:user_id])
+                       .as('subscription_durations')
+        }
+        join = Join.new(table, :inner) do
+          on(:id).eq(:user_id)
+        end
+        exp = <<~SQL.squish
+          SELECT * FROM users 
+          INNER JOIN 
+           (SELECT subscriptions.user_id, SUM(subscriptions.duration) 
+            FROM subscriptions 
+            WHERE subscriptions.thru <= '2021-08-18'
+            GROUP BY subscriptions.user_id) subscription_durations 
+          ON users.id = subscription_durations.user_id
+        SQL
+        now = Date.parse('2021-08-18')
+        assert_equal exp, join.to_arel(User.arel_table, User.arel_table, { date: now }, {}).project(Arel.star).to_sql.unquote
+      end
+
+      def test_literal_works_instead_of_arel_table
+        literal = <<~SQL.squish
+         (SELECT subscriptions.user_id, SUM(subscriptions.duration) 
+          FROM subscriptions 
+          WHERE subscriptions.thru <= '2021-08-18'
+          GROUP BY subscriptions.user_id)
+        SQL
+        join = Join.new(literal, :inner, table_alias: 'subscription_durations') do
+          on('users.id = subscription_durations.user_id', arel_table: :none)
+        end
+        exp = <<~SQL.squish
+          SELECT * FROM users 
+          INNER JOIN  
+           (SELECT subscriptions.user_id, SUM(subscriptions.duration) 
+            FROM subscriptions 
+            WHERE subscriptions.thru <= '2021-08-18'
+            GROUP BY subscriptions.user_id) AS subscription_durations 
+          ON (users.id = subscription_durations.user_id)
+        SQL
+        now = Date.parse('2021-08-18')
+        assert_equal exp, join.to_arel(User.arel_table, User.arel_table, { date: now }, {}).project(Arel.star).to_sql.unquote
+      end
     end
   end
 end

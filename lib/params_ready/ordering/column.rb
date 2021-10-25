@@ -27,7 +27,7 @@ module ParamsReady
 
       def attribute(name, default_table, context)
         arel_table = table || default_table
-        arel_builder = Helpers::ArelBuilder.instance(expression(name), arel_table: arel_table)
+        arel_builder = Helpers::ArelBuilder::Attribute.instance(expression(name), arel_table: arel_table)
         arel_builder.to_arel(arel_table, context, self)
       end
 

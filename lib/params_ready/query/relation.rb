@@ -297,8 +297,8 @@ module ParamsReady
         add ordering
       end
 
-      def join_table(arel_table, type, &block)
-        join = Join.new arel_table, type, &block
+      def join_table(arel_table, type, table_alias: nil, &block)
+        join = Join.new arel_table, type, table_alias: nil, &block
         @definition.add_join(join)
       end
     end

@@ -70,7 +70,7 @@ module ParamsReady
         end
 
         def build_select_expression(arel_table, context)
-          arel_builder = Helpers::ArelBuilder.instance(select_expression, arel_table: @arel_table)
+          arel_builder = Helpers::ArelBuilder::Attribute.instance(select_expression, arel_table: @arel_table)
           arel = arel_builder.to_arel(arel_table, context, self)
 
           arel
