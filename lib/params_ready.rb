@@ -25,12 +25,4 @@ require_relative 'params_ready/query/nullness_predicate'
 require_relative 'params_ready/query/polymorph_predicate'
 require_relative 'params_ready/query/relation'
 require_relative 'params_ready/query/variable_operator_predicate'
-
-
-module ParamsReady
-  VERSION = '0.0.7'.freeze
-
-  def self.gem_version
-    ::Gem::Version.new(VERSION)
-  end
-end
+require_relative 'params_ready/version'
