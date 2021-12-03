@@ -1,4 +1,4 @@
-require 'params_ready'
+require_relative 'lib/params_ready/version'
 
 Gem::Specification.new do |s|
   s.name        = 'params_ready'
@@ -106,6 +106,7 @@ Gem::Specification.new do |s|
     lib/params_ready/query_context.rb
     lib/params_ready/restriction.rb
     lib/params_ready/result.rb
+    lib/params_ready/version.rb
 
     lib/params_ready.rb
   ]
