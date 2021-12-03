@@ -1,4 +1,4 @@
-require_relative 'lib/params_ready'
+require 'params_ready'
 
 Gem::Specification.new do |s|
   s.name        = 'params_ready'
