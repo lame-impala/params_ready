@@ -21,12 +21,12 @@ module ParamsReady
       end
 
       def test_all_attributes_set_on_create_using_incomplete_input
-        _, p = get_user_def.from_input(name: 'Joe')
+        _, p = get_user_def.from_input({ name: 'Joe' })
         assert_equal( { name: 'Joe', role: 2, ranking: nil, owner_id: nil }, p.for_model(:create))
       end
 
       def test_optional_attributes_ommited_from_ouput_using_incomplete_input
-        _, p = get_user_def.from_input(name: 'Joe')
+        _, p = get_user_def.from_input({ name: 'Joe' })
         assert_equal( { name: 'Joe', owner_id: nil }, p.for_model(:update))
       end
 

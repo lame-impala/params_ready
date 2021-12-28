@@ -26,7 +26,7 @@ module ParamsReady
 
       def test_table_is_joined_if_condition_met
         d = get_relation_definition
-        _, r = d.from_input(num_subscriptions: 5)
+        _, r = d.from_input({ num_subscriptions: 5 })
         context = QueryContext.new(Restriction.blanket_permission, { join: true })
         arel = r.build_select(context: context)
         expected = <<~SQL.squish
@@ -40,7 +40,7 @@ module ParamsReady
 
       def test_table_is_not_joined_if_condition_unmet
         d = get_relation_definition
-        _, r = d.from_input(num_subscriptions: nil)
+        _, r = d.from_input({ num_subscriptions: nil })
         context = QueryContext.new(Restriction.blanket_permission, { join: false })
         arel = r.build_select(context: context)
         expected = <<~SQL.squish

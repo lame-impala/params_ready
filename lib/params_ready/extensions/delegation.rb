@@ -10,6 +10,7 @@ module ParamsReady
             super name, *args, &block
           end
         end
+        mod.send(:ruby2_keywords, :method_missing)
 
         mod.define_method :respond_to_missing? do |name, include_private = false|
           delegee = instance_eval(&to)

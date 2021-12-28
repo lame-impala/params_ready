@@ -49,7 +49,7 @@ module ParamsReady
     def test_sets_default_on_first_read
       d = get_def(proc { Global.previous }, proc { Global.current })
       Global.current = 1
-      _, p = d.from_input standard: 7
+      _, p = d.from_input({ standard: 7 })
       Global.current = 2
       assert_equal 1, p[:local].unwrap
       assert_equal 2, p[:default].unwrap
@@ -61,7 +61,7 @@ module ParamsReady
     def test_sets_default_on_unwrap
       d = get_def(proc { Global.previous }, proc { Global.current })
       Global.current = 1
-      _, p = d.from_input standard: 7
+      _, p = d.from_input({ standard: 7 })
       Global.current = 2
       exp = { local: 1, default: 2, standard: 7 }
       assert_equal exp, p.unwrap
@@ -83,7 +83,7 @@ module ParamsReady
     def test_default_canonicality_checked
       d = get_def(proc { Global.not_canonical }, proc { Global.not_canonical })
       Global.current = 1
-      _, p = d.from_input standard: 7
+      _, p = d.from_input({ standard: 7 })
       err = assert_raises(ParamsReadyError) do
         p[:local].unwrap
       end
@@ -97,7 +97,7 @@ module ParamsReady
 
     def test_constraints_applied_to_default
       d = get_def(proc { Global.previous }, proc { Global.current })
-      _, p = d.from_input standard: 7
+      _, p = d.from_input({ standard: 7 })
       Global.current = 6
       err = assert_raises(ParamsReadyError) do
         p[:default].unwrap
@@ -108,7 +108,7 @@ module ParamsReady
     def test_raises_propietary_error_if_callable_fails
       d = get_def(proc { Global.raising }, proc { Global.raising })
       Global.current = 1
-      _, p = d.from_input standard: 7
+      _, p = d.from_input({ standard: 7 })
       err = assert_raises(ParamsReadyError) do
         p[:local].unwrap
       end
