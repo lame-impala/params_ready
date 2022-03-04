@@ -4,6 +4,8 @@
 .byebug_history
 .ruby-version
 coverage/*
+tmp/*
+lib/tmp/*
 
 *.gem
 
