@@ -58,7 +58,8 @@ module ParamsReady
             found, count = Helpers::FindInHash.find_in_hash hash, count_key
             raise ParamsReadyError, "Count not found" unless found
 
-            count = Integer(count)
+            base = 10 if count.is_a? String
+            count = Integer(count, base)
             array = (0...count).map do |index|
               found, value = Helpers::FindInHash.find_in_hash hash, index
               element = definition.prototype.create

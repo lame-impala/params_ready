@@ -33,7 +33,8 @@ module ParamsReady
         definition = Builder.define_array :nonzero_integers do
           prototype :value do
             coerce do |input, _|
-              integer = Integer(input)
+              base = 10 if input.is_a? String
+              integer = Integer(input, base)
               next if integer == 0
 
               integer

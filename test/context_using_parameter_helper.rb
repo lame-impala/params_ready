@@ -7,7 +7,8 @@ module ContextUsingParameter
           next value unless context.marshal? :value
 
           inc = context[:inc]
-          coerced = Integer(value)
+          base = 10 if value.is_a? String
+          coerced = Integer(value, base)
           coerced + inc
         end
 

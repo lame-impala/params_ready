@@ -100,7 +100,9 @@ module ParamsReady
 
       def self.coerce(input, _)
         return nil if input.nil? || input == ''
-        Integer(input)
+
+        base = 10 if input.is_a? String
+        Integer(input, base)
       end
   
       def self.format(value, format)
