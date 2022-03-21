@@ -25,6 +25,8 @@ module ParamsReady
             next if frozen?
             self.class.variables_to_freeze.each do |(ivar, block)|
               variable = instance_variable_get ivar
+              next if Extensions::Undefined.value_indefinite?(variable)
+              
               block.call(variable) unless block.nil?
               variable.freeze
             end
