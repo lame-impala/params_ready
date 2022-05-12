@@ -113,13 +113,14 @@ module ParamsReady
     end
 
     class TupleParameterUpdateInTest < Minitest::Test
-      def get_def
+      def get_def(optional: false)
         Builder.define_tuple :updating do
           field :integer, :detail
           field :symbol, :type do
             constrain :enum, [:a, :b, :c]
           end
           marshal using: :string, separator: '|'
+          optional() if optional
         end
       end
 
@@ -139,6 +140,15 @@ module ParamsReady
         refute u.frozen?
         refute u[0].frozen?
         refute u[1].frozen?
+      end
+
+      def test_update_if_applicable_works_if_optional_and_nil
+        d = get_def(optional: true)
+        _, p = d.from_hash(nil)
+        changed, u = p.update_if_applicable([2, :b], [])
+        assert changed
+        assert_equal(2, u[0].unwrap)
+        assert_equal(:b, u[1].unwrap)
       end
 
       def test_update_if_applicable_works_if_called_on_frozen_self

@@ -807,6 +807,21 @@ module ParamsReady
         refute u.is_definite?
       end
 
+      def test_can_set_child_via_update_in_if_undefined
+        p = get_param optional: true
+        u = p.update_in(5, [:detail])
+        assert u.is_definite?
+        assert_equal({ detail: 5 }, u.unwrap)
+      end
+
+      def test_can_set_child_via_update_in_if_nil
+        p = get_param optional: true
+        p.set_value nil
+        u = p.update_in(5, [:detail])
+        assert u.is_definite?
+        assert_equal({ detail: 5 }, u.unwrap)
+      end
+
       def test_can_be_set_to_nil_via_update_n_if_frozen
         p = get_param optional: true
         p[:detail] = 4
