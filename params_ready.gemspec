@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name        = 'params_ready'
   s.version     = ParamsReady::VERSION
   s.licenses    = ['MIT']
-  s.date        = '2020-10-07'
+  s.date        = '2023-03-23'
   s.homepage    = 'https://github.com/lame-impala/params_ready'
   s.summary     = 'Define controller interfaces in Rails'
   s.description = <<~DESC
@@ -111,7 +111,7 @@ Gem::Specification.new do |s|
     lib/params_ready.rb
   ]
   s.add_dependency 'ruby2_keywords', '~> 0'
-  s.add_dependency 'activerecord', '~> 6'
+  s.add_dependency 'activerecord', '>= 6', '< 8'
   s.add_development_dependency 'byebug', '~> 11'
   s.add_development_dependency 'memory_profiler', '~> 0.9'
   s.add_development_dependency 'minitest-rg', '~> 5'
